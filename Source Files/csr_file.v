@@ -4,7 +4,13 @@ module csr_file(
     input [4:0] SR,
     input [63:0] DATA,
     input LD_REG,
+    input CS,
+    input [63:0] BASE_ADDRESS,
+    input [63:0] CAUSE,
+    input [1:0] PRIVILEGE,
+    input [63:0] NPC,
     output [63:0] OUT,
+    output [63:0] MTVEC,
     input CLK
 );
 
