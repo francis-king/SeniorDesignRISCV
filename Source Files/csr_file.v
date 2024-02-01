@@ -20,14 +20,14 @@ reg [63:0] regFile [4095:0];
 //csr file will load and store data in the same cycle
 always @(posedge CLK) begin
     if(CS)begin
-
+        
     end
     else begin
         if (ST_REG)begin
-            OUT <= regFile[SR]
+            OUT = regFile[SR]
         end
         if (LD_REG) begin
-            regFile[DR] <= DATA;
+            regFile[DR] = DATA;
         end
     end
 
