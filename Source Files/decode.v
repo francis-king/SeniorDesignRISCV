@@ -86,9 +86,9 @@ always @(*) begin
     end else if (`opcode == 7'b1100111 || `opcode == 7'b0000011 || ((`opcode == 7'b0010011) && (DE_IR[13:12] != 2'01)) || ((`opcode == 7'b0011011) && (`func3 == 3'b000))) begin
         de_ALU2_imm_out = (DE_IR[31]) ? {52'hFFFFFFFFFFFFF, DE_IR[31:20]} : {52'd0,DE_IR[31:20]};
     end else if ((`opcode == 7'b0010011) && (DE_IR[13:12] == 2'01)) begin
-        de_ALU2_imm_out = DE_IR[25:20];
+        de_ALU2_imm_out = {58'd0, DE_IR[25:20]};
     end else if (`opcode == 7'b0011011) begin
-        de_ALU2_imm_out = DE_IR[24:20];
+        de_ALU2_imm_out = {59'd0, DE_IR[24:20]};
     end
 end
 
