@@ -31,7 +31,6 @@ module csr_file(
     input LD_REG,
     input ST_REG,
     input CS,
-    input [1:0] NEW_PRIVILEGE,
     input [63:0] BASE_ADDRESS,
     input [63:0] CAUSE,
     input [63:0] NPC,
@@ -52,13 +51,13 @@ assign RET = {2'b0,PRIVILEGE[3:2],28'h0200073};
 always @(posedge CLK) begin
     if(CS)begin
 
-        regFile[{2'b0,NEW_PRIVILEGE,8'h42}] <= CAUSE;                                                                               //_Cause register set
-        PC_OUT <= regFile[{2'b0,NEW_PRIVILEGE,8'h05}] + (4*(CAUSE[12:0]));                                                          //trap address in vector table
-        regFile[{2'b0,NEW_PRIVILEGE[1:0],8'h00}][12:11] <= NEW_PRIVILEGE[1:0];                                                      //setting _status.xpp
-        regFile[{2'b0,NEW_PRIVILEGE[1:0],8'h00}][NEW_PRIVILEGE[1:0]+4] <= regFile[{2'b0,NEW_PRIVILEGE[1:0],8'h00}][PRIVILEGE[3:2]]; //setting _status.xpie to _status.yie
-        regFile[{2'b0,NEW_PRIVILEGE[1:0],8'h00}][NEW_PRIVILEGE[1:0]] <= 0;                                                          //setting _status.xie to 0
-        regFile[{2'b0,NEW_PRIVILEGE[1:0],8'h41}] <= NPC;                                                                            //saving PC in _PC
-        PRIVILEGE <= NEW_PRIVILEGE;                                                                                                 
+        regFile[{2'b0,NEW_PRIVILEGE,8'h42}] <= CAUSE;                                        //_Cause register set
+        PC_OUT <= regFile[{2'b0,NEW_PRIVILEGE,8'h05}] + (4*(CAUSE[12:0]));                   //trap address in vector table
+        regFile[{2'b0,2'b11,8'h00}][12:11] <= 2'b11;                                         //setting _status.xpp
+        regFile[{2'b0,2'b11,8'h00}][2'b11+4] <= regFile[{2'b0,2'b11,8'h00}][PRIVILEGE[3:2]]; //setting _status.xpie to _status.yie
+        regFile[{2'b0,2'b11,8'h00}][2'b11] <= 0;                                             //setting _status.xie to 0
+        regFile[{2'b0,2'b11,8'h41}] <= NPC;                                                  //saving PC in _PC
+        PRIVILEGE <= 2'b11;                                                                                                 
 
     end
     else if(IR == RET)begin
