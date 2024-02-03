@@ -1,11 +1,10 @@
 module fetch (
     input [1:0] MEM_PCMUX,
     input [63:0] WB_BR_JMP_PC,
-    input [63:0] TRAP_PC
+    input [63:0] DE_MTVEC,
     input v_de_br_stall,
     input v_agex_br_stall,
     input v_mem_br_stall,
-    input dep_stall,
     input reset,
     input CLK,
     output reg [63:0] DE_NPC,
@@ -40,17 +39,17 @@ instruction_cache a0 (.PC(FE_PC), .cache_hit(cache_hit), .instruction(FE_instruc
 // } else if (v_mem_br_stall && mem_pcmux == 0) {
 //     FE_LD_PC = 0;
 // } else { FE_LD_PC = 1; }
-assign FE_LD_PC = (dep_stall || mem_stall || v_de_br_stall || v_agex_br_stall || (icache_r && !v_mem_br_stall) || (v_mem_br_stall && !mem_pcmux)) ? 'd0 : 'd1;
+assign FE_LD_PC = (mem_stall || v_de_br_stall || v_agex_br_stall || (icache_r && !v_mem_br_stall) || (v_mem_br_stall && !mem_pcmux)) ? 'd0 : 'd1;
 
 // if(dep_stall || mem_stall) {
 //     LD_DE = 0;
 // } else { LD_DE = 1; }
-assign FE_LD_DE = (dep_stall || mem_stall) ? 'd0 : 'd1;
+assign FE_LD_DE = (mem_stall) ? 'd0 : 'd1;
 
 always@(*) begin
     case(MEM_PCMUX)
         'd0: FE_PC_input = WB_BR_JMP_PC;
-        'd1: FE_PC_input = TRAP_PC;
+        'd1: FE_PC_input = DE_MTVEC;
         'd2: FE_PC_input = PC + 'd4;
         default: 
     endcase
