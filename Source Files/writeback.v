@@ -51,6 +51,8 @@ module writeback(
     output [4:0]  WB_DRID_OUT,
     output        PC_MUX,
     output [63:0] WB_IR_OUT,
+    output        WB_LD_REG,
+    output        WB_LD_CSR,
 
     output [63:0] CAUSE,
     output        CS, 
@@ -58,7 +60,7 @@ module writeback(
     
 )
 
-trap_handler T0(
+trap_handler Thandler(
     .CLK(CLK),
     .ECALL(WB_ECALL),
     .F_IAM(F_IAM),
@@ -81,17 +83,26 @@ always @(posedge CLK)begin
     if(WB_V)begin
         if(IR[6:0] == 7'b0000011)begin
             WB_RF_DATA <= WB_MEM_RESULT;
+            WB_LD_REG <= 1;
         end
         else if(IR[6:0] == 7'b0d10011)begin
             WB_RF_DATA <= WB_ALU_RESULT;
+            WB_LD_REG <= 1;
         end
         else if(IR[6:0] == 1110011)begin
             WB_RF_DATA <= WB_RFD;
+            WB_CSR_DATA <= WB_CSRFD;
+            WB_LD_REG <= 1;
+            WB_LD_CSR <= 1;
         end
         else if(IR[6:0] == 1100111 || IR[6:0] == 1101111)begin
             WB_RF_DATA <= WB_NPC;
+            WB_LD_REG <= 1;
         end
-        WB_CSR_DATA <= WB_CSRFD;
+        else begin
+
+        end
+        
         WB_BR_JMP_TARGET <= WB_ALU_RESULT;
         PC_MUX <= WB_PC_MUX;
         WB_IR_OUT <= WB_IR;
