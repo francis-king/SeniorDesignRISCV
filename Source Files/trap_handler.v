@@ -45,19 +45,7 @@ reg
 
 
 always@(posedge CLK)begin
-    if(ECALL)begin
-        CS <= 1;
-        CAUSE <= {1'b1,61'b0,PRIVILEGE};
-    end
-    else if(TIMER)begin
-        CS <= 1;
-        CAUSE <= {1'b1,60'b0,PRIVILEGE+4};
-    end
-    else if(EXTERNAL)begin
-        CS <= 1;
-        CAUSE <= {1'b1,59'b0,PRIVILEGE+8};
-    end
-    else if(F_IAM)begin
+    if(F_IAM)begin
         CS <= 1;
         CAUSE <= 0;
     end
@@ -85,6 +73,18 @@ always@(posedge CLK)begin
         CS <= 1;
         CAUSE <= 7;
     end
+    else if(ECALL)begin
+        CS <= 1;
+        CAUSE <= {1'b1,61'b0,PRIVILEGE};
+    end
+    else if(TIMER)begin
+        CS <= 1;
+        CAUSE <= {1'b1,60'b0,PRIVILEGE+4};
+    end
+    else if(EXTERNAL)begin
+        CS <= 1;
+        CAUSE <= {1'b1,59'b0,PRIVILEGE+8};
+    end 
     else begin
         cs <= 0;
     end

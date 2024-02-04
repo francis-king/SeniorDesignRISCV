@@ -1,38 +1,38 @@
 `timescale 1ns / 1ps
-module execute(exe_NPC, exe_CSRFD, exe_ALU1, exe_ALU2, exe_IR,
-               exe_V, exe_RFD, mem_PC, mem_ALU_RESULT, mem_IR,
-               mem_SR2, mem_SR1, mem_V, mem_CSRFD, mem_RFD,clk, mem_stall
+module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
+               EXE_V, EXE_RFD, MEM_PC, MEM_ALU_RESULT, MEM_IR,
+               MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, MEM_stall
                 );
 
-//`define func3 exe_IR[14:12];
-//`define exe_IR[30] exe_exe_IR[30];
-//`define exe_IR[6:0] exe_IR[6:0]
-//`define exe_IR[13:12] exe_IR[13:12];
-`define opcode exe_IR[6:0]
-`define func3 exe_IR[14:12]
-`define func7 exe_IR[31:25]
+//`define func3 EXE_IR[14:12];
+//`define EXE_IR[30] EXE_EXE_IR[30];
+//`define EXE_IR[6:0] EXE_IR[6:0]
+//`define EXE_IR[13:12] EXE_IR[13:12];
+`define opcode EXE_IR[6:0]
+`define func3 EXE_IR[14:12]
+`define func7 EXE_IR[31:25]
 input clk;
-input exe_V;
-input mem_stall;
-input [31:0] exe_IR;
-input [63:0] exe_NPC, exe_CSRFD, exe_ALU1, exe_ALU2;
-input [63:0] exe_RFD;
+input EXE_V;
+input MEM_stall;
+input [31:0] EXE_IR;
+input [63:0] EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2;
+input [63:0] EXE_RFD;
 
-output reg[31:0] mem_IR;
-output reg [63:0] mem_PC, mem_ALU_RESULT, mem_SR2, mem_SR1,
-              mem_CSRFD, mem_RFD;
-output reg mem_V;
+output reg[31:0] MEM_IR;
+output reg [63:0] MEM_PC, MEM_ALU_RESULT, MEM_SR2, MEM_SR1,
+              MEM_CSRFD, MEM_RFD;
+output reg MEM_V;
 
 wire [31:0] IR;
-wire [63:0] alu_A, alu_B, exe_pc, alu_out, temp, temp_div;
+wire [63:0] alu_A, alu_B, EXE_pc, alu_out, temp, temp_div;
 reg [63:0] shift_out;
 wire [127:0] temp_mul;
-assign exe_pc = exe_NPC - 'd4;
+assign EXE_pc = EXE_NPC - 'd4;
 
 assign alu_A = ((`opcode == 7'b0000011) || (`opcode == 0010111)
                 (`opcode == 7'b0100011) || (`opcode == 7'b1101111) ||
-                (`opcode == 7'b1100111))? exe_PC : exe_ALU1;
-assign alu_B = exe_ALU2;
+                (`opcode == 7'b1100111))? EXE_PC : EXE_ALU1;
+assign alu_B = EXE_ALU2;
 
 always @(*) begin
     //LUI
@@ -59,7 +59,7 @@ always @(*) begin
                 alu_out = alu_A ^ alu_B;
             end
             3'd5: begin
-                if (exe_IR[30]) begin
+                if (EXE_IR[30]) begin
                     alu_out = alu_A >>> alu_B[5:0]; 
                 end else begin
                     alu_out = alu_A >> alu_B[5:0]; 
@@ -75,7 +75,7 @@ always @(*) begin
     end else if (`opcode == 7'b0110011) begin
         case (func3)
             3'd0:begin
-                if (exe_IR[30] == 1'b1) begin
+                if (EXE_IR[30] == 1'b1) begin
                     alu_out = alu_A - alu_B;
                 end else begin
                     alu_out = alu_A + alu_B;
@@ -94,7 +94,7 @@ always @(*) begin
                 alu_out = alu_A ^ alu_B;
             end
             3'd5: begin
-                if (exe_IR[30]) begin
+                if (EXE_IR[30]) begin
                     alu_out = alu_A >>> alu_B[5:0]; 
                 end else begin
                     alu_out = alu_A >> alu_B[5:0]; 
@@ -118,7 +118,7 @@ always @(*) begin
                 alu_out = {32'd0, temp[31:0]};
             end
             3'd5: begin
-                if (exe_IR[30]) begin
+                if (EXE_IR[30]) begin
                     temp = ((alu_A[31]) ? {32'hFFFFFFFF, alu_A[31:0]} : {32'd0, alu_A[31:0]}) >>> alu_B[4:0]; 
                     alu_out = {32'd0, temp[31:0]};
                 end else begin
@@ -130,7 +130,7 @@ always @(*) begin
     end else if (`opcode == 7'b0111011) begin
         case (func3)
             3'd0: begin
-                if (exe_IR[30] == 1'b1) begin
+                if (EXE_IR[30] == 1'b1) begin
                     temp = alu_A - alu_B;
                 end else begin
                     temp = alu_A + alu_B;
@@ -142,7 +142,7 @@ always @(*) begin
                 alu_out = {32'd0, temp[31:0]};
             end
             3'd5: begin
-                if (exe_IR[30]) begin
+                if (EXE_IR[30]) begin
                     temp = ((alu_A[31]) ? {32'hFFFFFFFF, alu_A[31:0]} : {32'd0, alu_A[31:0]}) >>> alu_B[4:0]; 
                     alu_out = {32'd0, temp[31:0]};
                 end else begin
@@ -223,23 +223,23 @@ end
 wire [63:0] csrresult = 0;
 always @(*) begin
     case(DE_IR[13:12]) 
-        2'b01:csrresult = exe_RFD; //write
-        2'b10:csrresult = exe_ALU1 | exe_RFD; //or
-        2'b11:csrresult = exe_ALU1 & exe_RFD; //and
+        2'b01:csrresult = EXE_RFD; //write
+        2'b10:csrresult = EXE_ALU1 | EXE_RFD; //or
+        2'b11:csrresult = EXE_ALU1 & EXE_RFD; //and
         default: ;
     endcase
 end
 
 always @(posedge clk) begin
-    if (!mem_stall) begin
-        mem_PC <= exe_PC;
-        mem_ALU_RESULT <= alu_out;
-        mem_IR <= exe_IR;
-        mem_SR1 <= exe_ALU1;
-        mem_SR2 <= exe_ALU2;
-        mem_CSRFD <= exe_CSRFD;
-        mem_RFD <= csrresult;
-        mem_V <= exe_V;
+    if (!MEM_stall) begin
+        MEM_PC <= EXE_PC;
+        MEM_ALU_RESULT <= alu_out;
+        MEM_IR <= EXE_IR;
+        MEM_SR1 <= EXE_ALU1;
+        MEM_SR2 <= EXE_ALU2;
+        MEM_CSRFD <= EXE_CSRFD;
+        MEM_RFD <= csrresult;
+        MEM_V <= EXE_V;
     end
 end
 endmodule
