@@ -26,6 +26,11 @@ module top(
 
 )
 
+//wires from FETCH stage
+wire f_iam;
+wire f_iaf;
+wire f_ii;
+
 
 
 

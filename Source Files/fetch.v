@@ -14,7 +14,7 @@ module fetch (
     output reg DE_V,
     output F_IAM,
     output F_IAF,
-    output F_II,
+    output F_II
 );
 
 `define opcode DE_IR[6:0]
