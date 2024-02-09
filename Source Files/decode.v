@@ -30,7 +30,7 @@ module decode (
     output reg        EXE_ECALL,
     output reg [63:0] RFD,
     output            v_de_br_stall,
-    output     [63:0] DE_PC_OUT
+    output     [63:0] DE_MTVEC
 );
 `define func3 DE_IR[14:12]
 `define opcode DE_IR[6:0]
@@ -58,7 +58,7 @@ csr_file csr(
     .CAUSE(WB_CAUSE),
     .NPC(DE_NPC),
     .OUT(EXE_CSFRD),
-    .PC_OUT(DE_PC_OUT),
+    .PC_OUT(DE_MTVEC),
     .CLK(CLK)
 )
 

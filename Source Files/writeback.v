@@ -50,7 +50,7 @@ module writeback(
     output [63:0] WB_CSR_DATA,
     output [63:0] WB_BR_JMP_TARGET,
     output [4:0]  WB_DRID_OUT,
-    output        PC_MUX,
+    output        WB_PC_MUX_OUT,
     output [63:0] WB_IR_OUT,
     output        WB_LD_REG,
     output        WB_ST_CSR,

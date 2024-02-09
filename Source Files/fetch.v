@@ -1,5 +1,5 @@
 module fetch (
-    input [1:0] MEM_PCMUX,
+    input [1:0] WB_PC_MUX,
     input [63:0] WB_BR_JMP_PC,
     input [63:0] DE_MTVEC,
     input DE_CS,
@@ -8,7 +8,7 @@ module fetch (
     input v_mem_br_stall,
     input reset,
     input CLK,
-    intput RESET,
+    input RESET,
     output reg [63:0] DE_NPC,
     output reg [31:0] DE_IR,
     output reg DE_V,
@@ -58,7 +58,7 @@ assign FE_LD_PC = (mem_stall || v_de_br_stall || v_agex_br_stall || (icache_r &&
 assign FE_LD_DE = (mem_stall) ? 'd0 : 'd1;
 
 always@(*) begin
-    case({DE_CS,MEM_PCMUX})
+    case({DE_CS,WB_PC_MUX})
         2'b01: FE_PC_input = WB_BR_JMP_PC;
         2'b02: FE_PC_input = PC + 'd4;
         2'b1x: FE_PC_input = DE_MTVEC;
