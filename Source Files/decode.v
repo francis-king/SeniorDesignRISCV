@@ -8,30 +8,35 @@ module decode (
     input [63:0] MEM_ALU_RESULT,
     input [63:0] WB_ALU_RESULT,
     input [63:0] WB_MEM_RESULT,
+    input        WB_CS,
+    input        WB_CAUSE,
     input [63:0] EXE_IR,
     input [63:0] MEM_IR,
     input [4:0] EXE_DRID,
     input [4:0] MEM_DRID,
     input WB_LD_REG,
-    input WB_LD_CSR,
+    input WB_ST_CSR,
     input [63:0] WB_IR,
     input LD_AGEX,
     input CLK,
+
     output reg [31:0] EXE_NPC,
     output reg [63:0] EXE_CSFRD,
     output reg [63:0] WB_CSR_DATA,
     output reg [63:0] EXE_ALU_ONE,
     output reg [63:0] EXE_ALU_TWO,
     output reg [31:0] EXE_IR,
-    output reg EXE_V,
-    output reg EXE_ECALL,
-    output reg [63:0] RFD
-    output v_de_br_stall,
+    output reg        EXE_V,
+    output reg        EXE_ECALL,
+    output reg [63:0] RFD,
+    output            v_de_br_stall,
+    output     [63:0] DE_PC_OUT
 );
 `define func3 DE_IR[14:12]
 `define opcode DE_IR[6:0]
-wire DE_MEM_ALU_SR, DE_WB_ALU_SR, DE_WB_MEM_SR;
+wire DE_MEM_ALU_SR, DE_WB_ALU_SR, DE_WB_MEM_SR ;
 wire [63:0] de_reg_out_one, de_reg_out_two, de_ALU1_out, de_ALU2_reg_out, exe_alu_in, de_ALU2_imm_out;
+
 register_file regFile (
     .DR(WB_IR[11:7]), 
     .SR1(DE_IR[19:15]), 
@@ -42,14 +47,18 @@ register_file regFile (
     .out_two(de_reg_out_two), 
     .CLK(CLK)
     );
-//TODO: figure out load reg for reg and csr file
+
 csr_file csr(
     .DR(WB_IR[31:20]),
     .SR(DE_IR[31:20]),
     .DATA(WB_CSR_DATA),
-    .LD_REG(),
-    .ST_REG(WB_LD_CSR),
-
+    .ST_REG(WB_ST_CSR),
+    .CS(WB_CS),
+    .CAUSE(WB_CAUSE),
+    .NPC(DE_NPC),
+    .OUT(EXE_CSFRD),
+    .PC_OUT(DE_PC_OUT),
+    .CLK(CLK)
 )
 
 

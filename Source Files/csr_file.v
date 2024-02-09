@@ -28,15 +28,14 @@ module csr_file(
     input [11:0] SR,
     input [63:0] DATA,
     input [63:0] IR,
-    input LD_REG,
     input ST_REG,
     input CS,
-    input [63:0] BASE_ADDRESS,
     input [63:0] CAUSE,
     input [63:0] NPC,
     output reg [63:0] OUT,
     output reg [63:0] PC_OUT,
-    input CLK
+    input CLK,
+    input RESET
 );
 
 
@@ -49,7 +48,11 @@ assign RETURN_PRIVILEGE = regFile[{2'b0,PRIVILEGE[1:0],8'h00}][12:11];
 assign RET = {2'b0,PRIVILEGE[3:2],28'h0200073};
 
 always @(posedge CLK) begin
-    if(CS)begin
+    if(RESET)begin
+        PRIVILEGE <= 0;
+        //TODO: reset misa and mhartid registers
+    end
+    else if(CS)begin
 
         regFile[{2'b0,NEW_PRIVILEGE,8'h42}] <= CAUSE;                                        //_Cause register set
         PC_OUT <= regFile[{2'b0,NEW_PRIVILEGE,8'h05}] + (4*(CAUSE[12:0]));                   //trap address in vector table
@@ -69,11 +72,10 @@ always @(posedge CLK) begin
     end
     else begin
         if (ST_REG)begin
-            OUT <= regFile[SR];     
-        end
-        if (LD_REG) begin
             regFile[DR] <= DATA;
         end
+        OUT <= regFile[SR];     
+
     end
 
 end

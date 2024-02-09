@@ -41,8 +41,6 @@ module trap_handler(
     
 )
 
-reg
-
 
 always@(posedge CLK)begin
     if(F_IAM)begin

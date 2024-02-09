@@ -24,6 +24,7 @@
 
 module writeback(
     input CLK,
+    input RESET,
     input [63:0] WB_NPC,
     input [63:0] WB_MEM_RESULT,
     input [63:0] WB_ALU_RESULT,
@@ -52,10 +53,10 @@ module writeback(
     output        PC_MUX,
     output [63:0] WB_IR_OUT,
     output        WB_LD_REG,
-    output        WB_LD_CSR,
+    output        WB_ST_CSR,
 
-    output [63:0] CAUSE,
-    output        CS, 
+    output [63:0] WB_CAUSE,
+    output        WB_CS, 
 
     
 )
@@ -73,8 +74,8 @@ trap_handler Thandler(
     .TIMER(TIMER),
     .EXTERNAL(EXTERNAL),
     .PRIVILEGE(PRIVILEGE),
-    .CAUSE(CAUSE),
-    .CS(CS),
+    .CAUSE(WB_CAUSE),
+    .CS(WB_CS),
 )
 
 
@@ -85,7 +86,7 @@ always @(posedge CLK)begin
             WB_RF_DATA <= WB_MEM_RESULT;
             WB_LD_REG <= 1;
         end
-        else if(IR[6:0] == 7'b0d10011)begin
+        else if(IR[6:0] == 7'b0x10011)begin
             WB_RF_DATA <= WB_ALU_RESULT;
             WB_LD_REG <= 1;
         end
@@ -93,7 +94,7 @@ always @(posedge CLK)begin
             WB_RF_DATA <= WB_RFD;
             WB_CSR_DATA <= WB_CSRFD;
             WB_LD_REG <= 1;
-            WB_LD_CSR <= 1;
+            WB_ST_CSR <= 1;
         end
         else if(IR[6:0] == 1100111 || IR[6:0] == 1101111)begin
             WB_RF_DATA <= WB_NPC;

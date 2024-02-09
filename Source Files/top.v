@@ -5,13 +5,11 @@
 // 
 // Create Date: 02/02/2024 12:55:36 PM
 // Design Name: 
-// Module Name: csr
+// Module Name: TOP
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: This File holds the Control Status Registers for the core and handles
-// the hardware operations that occur when a context switch occurs (interrupt/exception).
-// The CSR file can also be written to and read from using the 6 csr instructions
+// Description: This file connects all the different pipeline stages.
 //  
 // 
 // Dependencies: 
@@ -22,6 +20,10 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-module top()
+module top(
+    input CLK,
+    input RESET,
+
+)
 
 endmodule

@@ -46,6 +46,10 @@ module memory(
     output [63:0] WB_RFD,
     output [63:0] WB_DRID,
     output        WB_ECALL,
+    output        MEM_LAM,
+    output        MEM_LAF,
+    output        MEM_SAM,
+    output        MEM_SAF,
     
 
 )
