@@ -15,10 +15,11 @@ reg [7:0] memory [`numSize:0];
 // } else{
 //     icache_r = 0;
 // }
+integer i;
 initial begin
-    #readmemh(`fileName, memory, 0, `numInstructions);
+    #readmemh(`fileName, memory, 0, `numInstructions - 1);
     for (i = i + 1; i < `numSize; i = i + 1) begin
-        memory[i] = 0;
+        memory[i] = 'd0;
     end
 end
 
