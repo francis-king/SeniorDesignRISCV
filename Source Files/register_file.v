@@ -6,15 +6,21 @@ module register_file(
     input [4:0] SR2,
     input [63:0] WB_DATA,
     input WB_LD_REG,
+    input reset,
     output [63:0] out_one,
     output [63:0] out_two,
     input CLK
 );
 
 reg [63:0] regFile [31:0];
-
+integer i;
 always @(posedge CLK) begin
-    if (WB_LD_REG) begin
+    if (reset) begin
+        for(i = 0; i < 64; i= i+1)
+        begin
+            regFile[i] <= 32'd0;
+        end 
+    end else if (WB_LD_REG) begin
         regFile[DR] <= WB_DATA;
     end
 end

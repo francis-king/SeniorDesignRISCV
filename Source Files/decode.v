@@ -19,7 +19,7 @@ module decode (
     input [63:0] WB_IR,
     input LD_AGEX,
     input CLK,
-
+    input reset,
     output reg [31:0] EXE_NPC,
     output reg [63:0] EXE_CSFRD,
     output reg [63:0] WB_CSR_DATA,
@@ -34,7 +34,7 @@ module decode (
 );
 `define func3 DE_IR[14:12]
 `define opcode DE_IR[6:0]
-wire DE_MEM_ALU_SR, DE_WB_ALU_SR, DE_WB_MEM_SR ;
+wire DE_MEM_ALU_SR, DE_WB_ALU_SR, DE_WB_MEM_SR, reset;
 wire [63:0] de_reg_out_one, de_reg_out_two, de_ALU1_out, de_ALU2_reg_out, exe_alu_in, de_ALU2_imm_out;
 
 register_file regFile (
@@ -43,6 +43,7 @@ register_file regFile (
     .SR2(DE_IR[24:20]), 
     .WB_DATA(WB_DATA), 
     .WB_LD_REG(WB_LD_REG), 
+    .reset(reset),
     .out_one(de_reg_out_one), 
     .out_two(de_reg_out_two), 
     .CLK(CLK)
