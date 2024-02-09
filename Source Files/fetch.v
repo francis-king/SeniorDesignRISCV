@@ -13,7 +13,7 @@ module fetch (
     output reg DE_V,
     output F_IAM,
     output F_IAF,
-    output F_II,
+    output F_II
 );
 
 `define opcode DE_IR[6:0]
@@ -37,6 +37,7 @@ always @(posedge CLK) begin
 end
 
 reg [31:0] FE_instruction;
+
 instruction_cache a0 (.PC(FE_PC), .cache_hit(cache_hit), .instruction(FE_instruction));
 
 assign F_IAF = ~cache_hit;

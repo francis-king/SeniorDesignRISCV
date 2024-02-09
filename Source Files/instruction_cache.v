@@ -6,7 +6,7 @@ module instruction_cache (
 
 reg [63:12] cacheAddress;
 `define memSize 4095
-`define fileName "in.mem"
+`define fileName "TestInstructionMemLoad.mem"
 //Page Size of 2^12 byte sized elements
 reg [7:0] memory [`numSize:0];
 `define numInstructions 4*1
