@@ -15,7 +15,10 @@ module fetch (
     output F_IAF,
     output F_II,
 );
-//TODO: add II and IAM signals
+
+`define opcode DE_IR[6:0]
+`define func3 DE_IR[14:12]
+//TODO:IAM signals
 reg [63:0] FE_PC;
 wire FE_LD_PC, FE_LD_DE;
 wire [63:0] FE_PC_input;
@@ -37,6 +40,7 @@ reg [31:0] FE_instruction;
 instruction_cache a0 (.PC(FE_PC), .cache_hit(cache_hit), .instruction(FE_instruction));
 
 assign F_IAF = ~cache_hit;
+assign FE_II = ((`opcode == 7'b0110111) || (`opcode == 7'b0010111) || (`opcode == 7'b1101111) || ((`opcode == 7'b1100111) && (`func3 == 3'b000)) || (`opcode == 7'b1100011) || ((`opcode == 7'b0000011) && (`func3 != 3'b111)) || ((`opcode == 7'b0100011) && (DE_IR[14] == 1'b0)) || (`opcode == 7'b0010011) || (`opcode == 7'b0110011) || (`opcode == 7'b0001111) || (`opcode == 7'b1110011) || ((`opcode == 7'b0011011) && ((`func3 == 3'b001) || (`func3 == 3'b101) || (`func3 == 3'b000))) || ((`opcode == 7'b0111011) && ((`func3 == 3'b001) || (`func3 == 3'b101) || (`func3 == 3'b000))) || (`opcode == 7'b1110011) || (`opcode == 7'b0110011) || (`opcode == 7'b0111011)) ? 1'b0 : 1'b1;
 
 // if(dep_stall || mem_stall || v_de_br_stall || v_agex_br_stall) {
 //     FE_LD_PC = 0;
@@ -46,7 +50,6 @@ assign F_IAF = ~cache_hit;
 //     FE_LD_PC = 0;
 // } else { FE_LD_PC = 1; }
 assign FE_LD_PC = (mem_stall || v_de_br_stall || v_agex_br_stall || (icache_r && !v_mem_br_stall) || (v_mem_br_stall && !mem_pcmux)) ? 'd0 : 'd1;
-
 // if(dep_stall || mem_stall) {
 //     LD_DE = 0;
 // } else { LD_DE = 1; }
