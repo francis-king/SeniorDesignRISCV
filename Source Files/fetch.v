@@ -38,6 +38,7 @@ always @(posedge CLK) begin
 end
 
 reg [31:0] FE_instruction;
+
 instruction_cache a0 (.PC(FE_PC), .cache_hit(cache_hit), .instruction(FE_instruction));
 
 assign F_IAF = ~cache_hit;
