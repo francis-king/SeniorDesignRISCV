@@ -61,7 +61,8 @@ always @(posedge CLK) begin
         regFile[{2'b0,2'b11,8'h00}][2'b11+4] <= regFile[{2'b0,2'b11,8'h00}][PRIVILEGE[3:2]]; //setting _status.xpie to _status.yie
         regFile[{2'b0,2'b11,8'h00}][2'b11] <= 0;                                             //setting _status.xie to 0
         regFile[{2'b0,2'b11,8'h41}] <= NPC;                                                  //saving PC in _PC
-        PRIVILEGE <= 2'b11;                                                                                                 
+        PRIVILEGE <= 2'b11;
+        DE_CS <= 1;                                                                                                 
 
     end
     else if(IR == RET)begin
@@ -69,6 +70,7 @@ always @(posedge CLK) begin
         regFile[{2'b0,PRIVILEGE[1:0],8'h00}][PRIVILEGE[1:0]+4] <= 1;                                                            //setting _status.xie to 1
         MTVEC <= regFile[{2'b0,PRIVILEGE[1:0],8'h41}];                                                                         //outputting _epc
         PRIVILEGE <= RETURN_PRIVILEGE;
+        DE_CS <= 1;                                                                                                 
 
     end
     else begin

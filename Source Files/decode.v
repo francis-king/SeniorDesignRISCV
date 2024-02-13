@@ -1,3 +1,27 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 02/02/2024 12:55:36 PM
+// Design Name: 
+// Module Name: decode
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: This file decodes the instructions and retrieves and data needed
+//from the register file and creates the arguments and control signals for the 
+//execute and memory stages.
+//  
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
 module decode (
     input [63:0] DE_NPC,
     input [31:0] DE_IR,
@@ -9,20 +33,19 @@ module decode (
     input [63:0] WB_ALU_RESULT,
     input [63:0] WB_MEM_RESULT,
     input        WB_CS,
-    input        WB_CAUSE,
+    input [63:0] WB_CAUSE,
     input [63:0] EXE_IR,
     input [63:0] MEM_IR,
     input [4:0] EXE_DRID,
     input [4:0] MEM_DRID,
-    input WB_LD_REG,
+    input WB_ST_REG,
     input WB_ST_CSR,
     input [63:0] WB_IR,
-    input LD_AGEX,
+    input MEM_STALL,
     input CLK,
     input reset,
     output reg [31:0] EXE_NPC,
     output reg [63:0] EXE_CSFRD,
-    output reg [63:0] WB_CSR_DATA,
     output reg [63:0] EXE_ALU_ONE,
     output reg [63:0] EXE_ALU_TWO,
     output reg [31:0] EXE_IR,
@@ -34,7 +57,7 @@ module decode (
 );
 `define func3 DE_IR[14:12]
 `define opcode DE_IR[6:0]
-wire DE_MEM_ALU_SR, DE_WB_ALU_SR, DE_WB_MEM_SR, reset;
+wire DE_MEM_ALU_SR, DE_WB_ALU_SR, DE_WB_MEM_SR, LD_AGEX;
 wire [63:0] de_reg_out_one, de_reg_out_two, de_ALU1_out, de_ALU2_reg_out, exe_alu_in, de_ALU2_imm_out;
 
 register_file regFile (
@@ -42,8 +65,8 @@ register_file regFile (
     .SR1(DE_IR[19:15]), 
     .SR2(DE_IR[24:20]), 
     .WB_DATA(WB_DATA), 
-    .WB_LD_REG(WB_LD_REG), 
-    .reset(reset),
+    .WB_ST_REG(WB_ST_REG), 
+    .reset(RESET),
     .out_one(de_reg_out_one), 
     .out_two(de_reg_out_two), 
     .CLK(CLK)
@@ -52,7 +75,7 @@ register_file regFile (
 csr_file csr(
     .DR(WB_IR[31:20]),
     .SR(DE_IR[31:20]),
-    .DATA(WB_CSR_DATA),
+    .DATA(WB_CSRFD),
     .ST_REG(WB_ST_CSR),
     .CS(WB_CS),
     .CAUSE(WB_CAUSE),
@@ -129,8 +152,8 @@ end
 
 assign v_de_br_stall = (`opcode == 7'b1100011) ? 1'd1 : 1'd0;
 assign EXE_ECALL_in = (DE_IR == 32'h00000073) ? 1'd1 : 1'd0;
-assign LD_AGEX = !mem_stall;
-assign EXE_V_in = DE_V && !mem_stall;
+assign LD_AGEX = !MEM_STALL;
+assign EXE_V_in = DE_V && !MEM_STALL;
 always @(posedge clk) begin
     if (LD_AGEX) begin
         EXE_NPC <= DE_NPC; 

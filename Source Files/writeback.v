@@ -28,7 +28,7 @@ module writeback(
     input [63:0] WB_NPC,
     input [63:0] WB_MEM_RESULT,
     input [63:0] WB_ALU_RESULT,
-    input [63:0] WB_IR,
+    input [31:0] WB_IR,
     input        WB_PC_MUX,
     input        WB_V,
     input [63:0] WB_CSRFD,
