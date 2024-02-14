@@ -1,7 +1,25 @@
 `timescale 1ns / 1ps
-module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
-               EXE_V, EXE_RFD, MEM_PC, MEM_ALU_RESULT, MEM_IR,
-               MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, MEM_stall
+module execute(
+    input        CLK,
+    input [63:0] EXE_NPC,
+    input [63:0] EXE_CSRFD,
+    input [63:0] EXE_ALU_ONE,
+    input [63:0] EXE_ALU_TWO,
+    input [31:0] EXE_IR,
+    input        EXE_V,
+    input        EXE_ECALL,
+    input [63:0] EXE_RFD,
+    
+    output reg [63:0] MEM_PC,
+    output reg [63:0] MEM_ALU_RESULT,
+    output reg [31:0] MEM_IR,
+    output reg [63:0] MEM_SR2,
+    output reg [63:0] MEM_SR1,
+    output reg        MEM_V,
+    output reg [63:0] MEM_CSRFD,
+    output reg [63:0] MEM_RFD,
+    output reg        MEM_stall,
+    output reg        MEM_ECALL
                 );
 
 //`define func3 EXE_IR[14:12];
@@ -11,17 +29,7 @@ module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
 `define opcode EXE_IR[6:0]
 `define func3 EXE_IR[14:12]
 `define func7 EXE_IR[31:25]
-input clk;
-input EXE_V;
-input MEM_stall;
-input [31:0] EXE_IR;
-input [63:0] EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2;
-input [63:0] EXE_RFD;
 
-output reg[31:0] MEM_IR;
-output reg [63:0] MEM_PC, MEM_ALU_RESULT, MEM_SR2, MEM_SR1,
-              MEM_CSRFD, MEM_RFD;
-output reg MEM_V;
 
 wire [31:0] IR;
 wire [63:0] alu_A, alu_B, EXE_pc, alu_out, temp, temp_div;
@@ -31,8 +39,8 @@ assign EXE_pc = EXE_NPC - 'd4;
 
 assign alu_A = ((`opcode == 7'b0000011) || (`opcode == 0010111)
                 (`opcode == 7'b0100011) || (`opcode == 7'b1101111) ||
-                (`opcode == 7'b1100111))? EXE_PC : EXE_ALU1;
-assign alu_B = EXE_ALU2;
+                (`opcode == 7'b1100111))? EXE_PC : EXE_ALU_ONE;
+assign alu_B = EXE_ALU_TWO;
 
 always @(*) begin
     //LUI
@@ -224,22 +232,23 @@ wire [63:0] csrresult = 0;
 always @(*) begin
     case(DE_IR[13:12]) 
         2'b01:csrresult = EXE_RFD; //write
-        2'b10:csrresult = EXE_ALU1 | EXE_RFD; //or
-        2'b11:csrresult = EXE_ALU1 & EXE_RFD; //and
+        2'b10:csrresult = EXE_ALU_ONE | EXE_RFD; //or
+        2'b11:csrresult = EXE_ALU_ONE & EXE_RFD; //and
         default: ;
     endcase
 end
 
-always @(posedge clk) begin
+always @(posedge CLK) begin
     if (!MEM_stall) begin
         MEM_PC <= EXE_PC;
         MEM_ALU_RESULT <= alu_out;
         MEM_IR <= EXE_IR;
-        MEM_SR1 <= EXE_ALU1;
-        MEM_SR2 <= EXE_ALU2;
+        MEM_SR1 <= EXE_ALU_ONE;
+        MEM_SR2 <= EXE_ALU_TWO;
         MEM_CSRFD <= EXE_CSRFD;
         MEM_RFD <= csrresult;
         MEM_V <= EXE_V;
+        MEM_ECALL <= EXE_ECALL;
     end
 end
 endmodule

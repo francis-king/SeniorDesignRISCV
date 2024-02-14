@@ -29,7 +29,7 @@ module writeback(
     input [63:0] WB_MEM_RESULT,
     input [63:0] WB_ALU_RESULT,
     input [31:0] WB_IR,
-    input        WB_PC_MUX,
+    input        MEM_PC_MUX,
     input        WB_V,
     input [63:0] WB_CSRFD,
     input [63:0] WB_RFD,
@@ -46,16 +46,17 @@ module writeback(
     input        EXTERNAL,
     input        PRIVILEGE, //from decode
 
-    output reg [63:0]   WB_RF_DATA,
-    output reg [63:0]   WB_CSR_DATA,
-    output reg [63:0]   WB_BR_JMP_TARGET,
-    output reg [4:0]    WB_DRID_OUT,
-    output reg          WB_PC_MUX_OUT,
-    output reg [63:0]   WB_IR_OUT,
-    output reg          WB_LD_REG,
-    output reg          WB_ST_CSR,
-    output [63:0]       WB_CAUSE,
-    output              WB_CS
+    output [63:0] WB_RF_DATA,
+    output [63:0] WB_CSR_DATA,
+    output [63:0] WB_BR_JMP_TARGET,
+    output [4:0]  WB_DRID_OUT,
+    output        WB_PC_MUX,
+    output [63:0] WB_IR_OUT,
+    output        WB_LD_REG,
+    output        WB_ST_CSR,
+
+    output [63:0] WB_CAUSE,
+    output        WB_CS, 
 
     
 );
