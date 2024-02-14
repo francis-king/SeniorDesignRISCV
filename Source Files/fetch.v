@@ -1,9 +1,8 @@
 module fetch (
     input mem_stall,
-    input [1:0] WB_PC_MUX,
+    input WB_PC_MUX,
     input [63:0] WB_BR_JMP_PC,
     input [63:0] DE_MTVEC,
-    input mem_pcmux,
     input DE_CS,
     input v_de_br_stall,
     input v_agex_br_stall,
@@ -53,12 +52,12 @@ assign FE_IAM = (FE_PC & 64'd3) == 0 ? 1'b0 : 1'b1;
 // } else if (v_mem_br_stall && mem_pcmux == 0) {
 //     FE_LD_PC = 0;
 // } else { FE_LD_PC = 1; }
-assign FE_LD_PC = (mem_stall || v_de_br_stall || v_agex_br_stall || (icache_r && !v_mem_br_stall) || (v_mem_br_stall && !mem_pcmux)) ? 'd0 : 'd1;
+assign FE_LD_PC = (mem_stall || v_de_br_stall || v_agex_br_stall || (icache_r && !v_mem_br_stall) || (v_mem_br_stall && !WB_PC_MUX)) ? 'd0 : 'd1;
 // if(dep_stall || mem_stall) {
 //     LD_DE = 0;
 // } else { LD_DE = 1; }
 assign FE_LD_DE = (mem_stall) ? 'd0 : 'd1;
-assign FE_PC_input = ({DE_CS,WB_PC_MUX} == 2'b00) ? WB_BR_JMP_PC : ({DE_CS,WB_PC_MUX} == 2'b01) ? FE_PC + 'd4 : DE_MTVEC; 
+assign FE_PC_input = ({DE_CS,WB_PC_MUX} == 2'b01) ? WB_BR_JMP_PC : ({DE_CS,WB_PC_MUX} == 2'b00) ? FE_PC + 'd4 : DE_MTVEC; 
 //always@(*) begin
 //    if ({DE_CS,WB_PC_MUX} == 2'b00) begin
 //        FE_PC_input = PC + 'd4;
