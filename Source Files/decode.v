@@ -23,6 +23,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module decode (
+    input clk,
     input [63:0] DE_NPC,
     input [31:0] DE_IR,
     input DE_V,
@@ -40,7 +41,6 @@ module decode (
     input [4:0] MEM_DRID,
     input WB_ST_REG,
     input WB_ST_CSR,
-    input [63:0] WB_IR,
     input MEM_STALL,
     input CLK,
     input reset,
@@ -58,7 +58,7 @@ module decode (
 `define func3 DE_IR[14:12]
 `define opcode DE_IR[6:0]
 wire DE_MEM_ALU_SR, DE_WB_ALU_SR, DE_WB_MEM_SR, LD_AGEX;
-wire [63:0] de_reg_out_one, de_reg_out_two, de_ALU1_out, de_ALU2_reg_out, exe_alu_in, de_ALU2_imm_out;
+reg [63:0] de_reg_out_one, de_reg_out_two, de_ALU1_out, de_ALU2_reg_out, exe_alu_in, de_ALU2_imm_out;
 
 register_file regFile (
     .DR(WB_IR[11:7]), 
@@ -83,7 +83,7 @@ csr_file csr(
     .OUT(EXE_RFD),
     .PC_OUT(DE_MTVEC),
     .CLK(CLK)
-)
+    );
 
 
 
@@ -117,9 +117,9 @@ always @(*) begin
     end
 end
 
-assign DE_MEM_ALU_SR = ((EXE_DRID == DE_IR[19:15]) && !EXE_IR[6] && EXE_IR[4]) ? 'd1 : 'd0;
-assign DE_WB_MEM_SR = ((MEM_DRID == DE_IR[19:15]) && !MEM_IR[6] && !MEM_IR[4]) ? 'd1 : 'd0;
-assign DE_WB_ALU_SR = ((MEM_DRID == DE_IR[19:15]) && !MEM_IR[6] && MEM_IR[4]) ? 'd1 : 'd0;
+assign DE_MEM_ALU_SR = ((EXE_DRID == DE_IR[19:15]) && !EXE_IR_OLD[6] && EXE_IR_OLD[4]) ? 'd1 : 'd0;
+assign DE_WB_MEM_SR = ((MEM_DRID == DE_IR[19:15]) && !MEM_IR_OLD[6] && !MEM_IR_OLD[4]) ? 'd1 : 'd0;
+assign DE_WB_ALU_SR = ((MEM_DRID == DE_IR[19:15]) && !MEM_IR_OLD[6] && MEM_IR_OLD[4]) ? 'd1 : 'd0;
 
 
 always @(*) begin
@@ -141,9 +141,9 @@ always @(*) begin
     end else if (`opcode == 7'b0110111 || `opcode == 7'b0010111) begin
         de_ALU2_imm_out = (DE_IR[31]) ? {32'hFFFFFFFF, DE_IR[31:12], 12'd0} : {32'd0, DE_IR[31:12], 12'd0};
     //JALR or Load or Generic Immediate
-    end else if (`opcode == 7'b1100111 || `opcode == 7'b0000011 || ((`opcode == 7'b0010011) && (DE_IR[13:12] != 2'01)) || ((`opcode == 7'b0011011) && (`func3 == 3'b000))) begin
+    end else if (`opcode == 7'b1100111 || `opcode == 7'b0000011 || (`opcode == 7'b0010011 && DE_IR[13:12] != 2'b01) || (`opcode == 7'b0011011 && `func3 == 3'b000)) begin
         de_ALU2_imm_out = (DE_IR[31]) ? {52'hFFFFFFFFFFFFF, DE_IR[31:20]} : {52'd0,DE_IR[31:20]};
-    end else if ((`opcode == 7'b0010011) && (DE_IR[13:12] == 2'01)) begin
+    end else if ((`opcode == 7'b0010011) && (DE_IR[13:12] == 2'b01)) begin
         de_ALU2_imm_out = {58'd0, DE_IR[25:20]};
     end else if (`opcode == 7'b0011011) begin
         de_ALU2_imm_out = {59'd0, DE_IR[24:20]};
