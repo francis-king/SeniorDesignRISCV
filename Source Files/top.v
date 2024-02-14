@@ -24,6 +24,8 @@ module top(
     input CLK,
     input RESET,
 )
+//stall signals
+wire v_de_br_stall;
 
 //wires from FETCH stage
 wire f_iam;
@@ -39,11 +41,19 @@ wire        de_v;
 
 
 //wires from EXECUTE stage
-wire [63:0] exe_ir;
-wire [4:0]  exe_drid; 
+wire [63:0] exe_ir_old;
+wire [4:0]  exe_drid;
+wire [31:0] exe_npc; 
+wire [63:0] exe_csrfd; 
+wire [63:0] exe_alu_one; 
+wire [63:0] exe_alu_two; 
+wire [63:0] exe_rfd; 
+wire [31:0] exe_ir; 
+wire        exe_valid; 
+wire        exe_ecall; 
 
 //wires from MEMORY stage
-wire [63:0] mem_ir;
+wire [63:0] mem_ir_old;
 wire [4:0]  mem_drid;
 wire [63:0] mem_alu_result;
 wire        mem_stall;
@@ -70,7 +80,7 @@ fetch fetch_stage(
     .WB_BR_JMP_PC(wb_br_jmp_pc),
     .DE_MTVEC(de_mtvec),
     .DE_CS(de_cs),
-    .v_de_br_stall(),      //TODO: figure out stall
+    .v_de_br_stall(v_de_br_stall),      //TODO: figure out stall
     .v_agex_br_stall(),
     .v_mem_br_stall(),
     .CLK(CLK),
@@ -95,8 +105,8 @@ decode decode_stage(
     WB_MEM_RESULT(wb_mem_result),
     WB_CS(wb_cs),
     WB_CAUSE(wb_cause),
-    EXE_IR(exe_ir),
-    MEM_IR(mem_ir),
+    EXE_IR_OLD(exe_ir_old),
+    MEM_IR_OLD(mem_ir_old),
     EXE_DRID(exe_drid),
     MEM_DRID(mem_drid),
     WB_ST_REG(wb_st_reg),
@@ -105,16 +115,16 @@ decode decode_stage(
     MEM_STALL(mem_stall),
     CLK(CLK),
     reset(RESET),
-    EXE_NPC,
-    EXE_CSFR
-    EXE_ALU_
-    EXE_ALU_
-    EXE_IR,
-    EXE_V,
-    EXE_ECAL
-    RFD,
-    v_de_br_stall
-    DE_MTVEC
+    EXE_NPC(exe_npc),
+    EXE_CSFR(exe_csrfd),
+    EXE_ALU_ONE(exe_alu_one),
+    EXE_ALU_TWO(exe_alu_two),
+    EXE_IR(exe_ir),
+    EXE_V(exe_v),
+    EXE_ECALL(exe_ecall),
+    EXE_RFD(exe_rfd),
+    v_de_br_stall(v_de_br_stall),
+    DE_MTVEC(de_mtvec)
 )
 
 

@@ -34,8 +34,8 @@ module decode (
     input [63:0] WB_MEM_RESULT,
     input        WB_CS,
     input [63:0] WB_CAUSE,
-    input [63:0] EXE_IR,
-    input [63:0] MEM_IR,
+    input [63:0] EXE_IR_OLD,
+    input [63:0] MEM_IR_OLD,
     input [4:0] EXE_DRID,
     input [4:0] MEM_DRID,
     input WB_ST_REG,
@@ -51,7 +51,7 @@ module decode (
     output reg [31:0] EXE_IR,
     output reg        EXE_V,
     output reg        EXE_ECALL,
-    output reg [63:0] RFD,
+    output reg [63:0] EXE_RFD,
     output            v_de_br_stall,
     output     [63:0] DE_MTVEC
 );
@@ -80,7 +80,7 @@ csr_file csr(
     .CS(WB_CS),
     .CAUSE(WB_CAUSE),
     .NPC(DE_NPC),
-    .OUT(EXE_CSFRD),
+    .OUT(EXE_RFD),
     .PC_OUT(DE_MTVEC),
     .CLK(CLK)
 )
@@ -163,7 +163,6 @@ always @(posedge clk) begin
         EXE_IR <= DE_IR;
         EXE_V <= EXE_V_in;
         EXE_ECALL <= EXE_ECALL_in;
-        RFD <= 
     end
 end
 endmodule
