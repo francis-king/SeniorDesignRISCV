@@ -56,7 +56,7 @@ module writeback(
     output        WB_ST_CSR,
 
     output [63:0] WB_CAUSE,
-    output        WB_CS, 
+    output        WB_CS
 
     
 );
@@ -76,7 +76,7 @@ trap_handler Thandler(
     .PRIVILEGE(PRIVILEGE),
     .CAUSE(WB_CAUSE),
     .CS(WB_CS),
-)
+);
 
 
 //mux for selecting data to be written to register file
