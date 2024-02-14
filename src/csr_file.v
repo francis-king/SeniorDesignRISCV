@@ -55,8 +55,8 @@ always @(posedge CLK) begin
     end
     else if(CS)begin
 
-        regFile[{2'b0,NEW_PRIVILEGE,8'h42}] <= CAUSE;                                        //_Cause register set
-        MTVEC <= regFile[{2'b0,NEW_PRIVILEGE,8'h05}] + (4*(CAUSE[12:0]));                   //trap address in vector table
+        regFile[{2'b0,2'b11,8'h42}] <= CAUSE;                                        //_Cause register set
+        MTVEC <= regFile[{2'b0,2'b11,8'h05}] + (4*(CAUSE[12:0]));                   //trap address in vector table
         regFile[{2'b0,2'b11,8'h00}][12:11] <= 2'b11;                                         //setting _status.xpp
         regFile[{2'b0,2'b11,8'h00}][2'b11+4] <= regFile[{2'b0,2'b11,8'h00}][PRIVILEGE[3:2]]; //setting _status.xpie to _status.yie
         regFile[{2'b0,2'b11,8'h00}][2'b11] <= 0;                                             //setting _status.xie to 0

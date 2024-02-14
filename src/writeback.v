@@ -46,20 +46,19 @@ module writeback(
     input        EXTERNAL,
     input        PRIVILEGE, //from decode
 
-    output [63:0] WB_RF_DATA,
-    output [63:0] WB_CSR_DATA,
-    output [63:0] WB_BR_JMP_TARGET,
-    output [4:0]  WB_DRID_OUT,
-    output        WB_PC_MUX_OUT,
-    output [63:0] WB_IR_OUT,
-    output        WB_LD_REG,
-    output        WB_ST_CSR,
-
-    output [63:0] WB_CAUSE,
-    output        WB_CS, 
+    output reg [63:0]   WB_RF_DATA,
+    output reg [63:0]   WB_CSR_DATA,
+    output reg [63:0]   WB_BR_JMP_TARGET,
+    output reg [4:0]    WB_DRID_OUT,
+    output reg          WB_PC_MUX_OUT,
+    output reg [63:0]   WB_IR_OUT,
+    output reg          WB_LD_REG,
+    output reg          WB_ST_CSR,
+    output [63:0]       WB_CAUSE,
+    output              WB_CS
 
     
-)
+);
 
 trap_handler Thandler(
     .CLK(CLK),

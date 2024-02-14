@@ -8,7 +8,7 @@ reg [63:12] cacheAddress;
 `define memSize 4095
 `define fileName "file.mem"
 //Page Size of 2^12 byte sized elements
-reg [7:0] memory [`numSize:0];
+reg [7:0] memory [`memSize:0];
 `define numInstructions 4*1
 // if (PC[63:12] == cacheAddress){
 //     icache_r = 1;
@@ -17,8 +17,8 @@ reg [7:0] memory [`numSize:0];
 // }
 integer i;
 initial begin
-    #readmemh(`fileName, memory, 0, `numInstructions - 1);
-    for (i = i + 1; i < `numSize; i = i + 1) begin
+    $readmemh(`fileName, memory, 0, `numInstructions - 1);
+    for (i = i + 1; i < `memSize; i = i + 1) begin
         memory[i] = 'd0;
     end
 end

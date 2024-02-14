@@ -37,9 +37,9 @@ module trap_handler(
     input  [1:0]  PRIVILEGE,
 
     output [63:0] CAUSE,
-    output        CS,
+    output        CS
     
-)
+);
 
 
 always@(posedge CLK)begin
@@ -84,7 +84,7 @@ always@(posedge CLK)begin
         CAUSE <= {1'b1,59'b0,PRIVILEGE+8};
     end 
     else begin
-        cs <= 0;
+        CS <= 0;
     end
 end
 
