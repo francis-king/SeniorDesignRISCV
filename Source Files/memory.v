@@ -50,10 +50,31 @@ module memory(
     output        MEM_LAF,
     output        MEM_SAM,
     output        MEM_SAF,
-    
+    output reg MEM_PC_MUX,
 
 )
 
+reg branch_taken;
+
+always @(*) begin
+    case(opcode)
+        // conditional
+        7'b1100011: branch_taken = (MEM_SR1 == MEM_SR2);         // beq
+        7'b1100011: branch_taken = (MEM_SR1 != MEM_SR2);         // bne
+        7'b1100011: branch_taken = (MEM_SR1 < MEM_SR2);          // blt
+        7'b1100011: branch_taken = (MEM_SR1 >= MEM_SR2);         // bge
+        7'b1100011: branch_taken = (MEM_SR1 < MEM_SR2);          // bltu
+        7'b1100011: branch_taken = (MEM_SR1 >= MEM_SR2);         // bgeu
+            
+        // uncoditional
+        7'b1101111: branch_taken = 1;                        // jal
+        7'b1100111: branch_taken = 1;                        // jalr
+            
+        default: branch_taken = 0; // default: no branch
+    endcase
+        
+    MEM_PC_MUX = branch_taken ? 1 : 0; // branch taken = 1, 0 otherwise
+end
 
 always @(posedge clk) begin
     if (!WB_stall) begin
@@ -69,3 +90,6 @@ always @(posedge clk) begin
 end
 
 endmodule
+
+
+
