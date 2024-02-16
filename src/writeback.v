@@ -29,7 +29,7 @@ module writeback(
     input [63:0] WB_MEM_RESULT,
     input [63:0] WB_ALU_RESULT,
     input [31:0] WB_IR,
-    input        MEM_PC_MUX,
+    input        WB_PC_MUX,
     input        WB_V,
     input [63:0] WB_CSRFD,
     input [63:0] WB_RFD,
@@ -46,17 +46,16 @@ module writeback(
     input        EXTERNAL,
     input        PRIVILEGE, //from decode
 
-    output [63:0] WB_RF_DATA,
-    output [63:0] WB_CSR_DATA,
-    output [63:0] WB_BR_JMP_TARGET,
-    output [4:0]  WB_DRID_OUT,
-    output        WB_PC_MUX,
-    output [63:0] WB_IR_OUT,
-    output        WB_LD_REG,
-    output        WB_ST_CSR,
-
-    output [63:0] WB_CAUSE,
-    output        WB_CS
+    output reg [63:0] WB_RF_DATA,
+    output reg [63:0] WB_CSR_DATA,
+    output reg [63:0] WB_BR_JMP_TARGET,
+    output reg [4:0]  WB_DRID_OUT,
+    output reg        WB_PC_MUX_OUT,
+    output reg [63:0] WB_IR_OUT,
+    output reg        WB_ST_REG,
+    output reg        WB_ST_CSR,
+    output reg [63:0] WB_CAUSE,
+    output reg        WB_CS
 
     
 );
@@ -80,33 +79,33 @@ trap_handler Thandler(
 
 
 //mux for selecting data to be written to register file
-always @(posedge CLK)begin
+always @(*)begin
     if(WB_V)begin
         if(IR[6:0] == 7'b0000011)begin
-            WB_RF_DATA <= WB_MEM_RESULT;
-            WB_LD_REG <= 1;
+            WB_RF_DATA = WB_MEM_RESULT;
+            WB_ST_REG = 1;
         end
         else if(IR[6:0] == 7'b0x10011)begin
-            WB_RF_DATA <= WB_ALU_RESULT;
-            WB_LD_REG <= 1;
+            WB_RF_DATA = WB_ALU_RESULT;
+            WB_ST_REG = 1;
         end
         else if(IR[6:0] == 1110011)begin
-            WB_RF_DATA <= WB_RFD;
-            WB_CSR_DATA <= WB_CSRFD;
-            WB_LD_REG <= 1;
-            WB_ST_CSR <= 1;
+            WB_RF_DATA = WB_RFD;
+            WB_CSR_DATA = WB_CSRFD;
+            WB_ST_REG = 1;
+            WB_ST_CSR = 1;
         end
         else if(IR[6:0] == 1100111 || IR[6:0] == 1101111)begin
-            WB_RF_DATA <= WB_NPC;
-            WB_LD_REG <= 1;
+            WB_RF_DATA = WB_NPC;
+            WB_LD_REG = 1;
         end
         else begin
 
         end
         
-        WB_BR_JMP_TARGET <= WB_ALU_RESULT;
-        PC_MUX <= WB_PC_MUX;
-        WB_IR_OUT <= WB_IR;
+        WB_BR_JMP_TARGET = WB_ALU_RESULT;
+        WB_PC_MUX = MEM_PC_MUX;
+        WB_IR_OUT = WB_IR;
     end
 
 end

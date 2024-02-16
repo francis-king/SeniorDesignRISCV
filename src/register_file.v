@@ -5,7 +5,7 @@ module register_file(
     input [4:0] SR1,
     input [4:0] SR2,
     input [63:0] WB_DATA,
-    input WB_ST_REG,
+    input ST_REG,
     input reset,
     output [63:0] out_one,
     output [63:0] out_two,
@@ -20,7 +20,7 @@ always @(posedge CLK) begin
         begin
             regFile[i] <= 32'd0;
         end 
-    end else if (WB_ST_REG) begin
+    end else if (ST_REG) begin
         regFile[DR] <= WB_DATA;
     end
 end

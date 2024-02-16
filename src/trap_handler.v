@@ -42,49 +42,49 @@ module trap_handler(
 );
 
 
-always@(posedge CLK)begin
+always@(*)begin
     if(F_IAM)begin
-        CS <= 1;
-        CAUSE <= 0;
+        CS = 1;
+        CAUSE = 0;
     end
     else if(F_IAF)begin
-        CS <= 1;
-        CAUSE <= 1;
+        CS = 1;
+        CAUSE = 1;
     end
     else if(F_II)begin
-        CS <= 1;
-        CAUSE <= 2;
+        CS = 1;
+        CAUSE = 2;
     end
     else if(MEM_LAM)begin
-        CS <= 1;
-        CAUSE <= 4;
+        CS = 1;
+        CAUSE = 4;
     end
     else if(MEM_LAF)begin
-        CS <= 1;
-        CAUSE <= 5;
+        CS = 1;
+        CAUSE = 5;
     end
     else if(MEM_SAM)begin
-        CS <= 1;
-        CAUSE <= 6;
+        CS = 1;
+        CAUSE = 6;
     end
     else if(MEM_SAF)begin
-        CS <= 1;
-        CAUSE <= 7;
+        CS = 1;
+        CAUSE = 7;
     end
     else if(ECALL)begin
-        CS <= 1;
-        CAUSE <= {1'b1,61'b0,PRIVILEGE};
+        CS = 1;
+        CAUSE = {1'b1,61'b0,PRIVILEGE};
     end
     else if(TIMER)begin
-        CS <= 1;
-        CAUSE <= {1'b1,60'b0,PRIVILEGE+4};
+        CS = 1;
+        CAUSE = {1'b1,60'b0,PRIVILEGE+4};
     end
     else if(EXTERNAL)begin
-        CS <= 1;
-        CAUSE <= {1'b1,59'b0,PRIVILEGE+8};
+        CS = 1;
+        CAUSE = {1'b1,59'b0,PRIVILEGE+8};
     end 
     else begin
-        CS <= 0;
+        CS = 0;
     end
 end
 
