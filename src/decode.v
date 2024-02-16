@@ -65,7 +65,7 @@ register_file regFile (
     .SR1(DE_IR[19:15]), 
     .SR2(DE_IR[24:20]), 
     .WB_DATA(WB_RFD), 
-    .WB_ST_REG(WB_ST_REG), 
+    .ST_REG(WB_ST_REG), 
     .reset(RESET),
     .out_one(de_reg_out_one), 
     .out_two(de_reg_out_two), 
