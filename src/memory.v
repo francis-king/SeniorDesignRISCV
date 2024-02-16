@@ -35,45 +35,43 @@ module memory(
     input [63:0] MEM_RFD,
     input [63:0] MEM_DRID,
     input        MEM_ECALL,
+    input [31:0] MEM_IR,
 
 
-    output [63:0] WB_NPC,
-    output [63:0] WB_CSRFD,
-    output [63:0] WB_ALU_RESULT,
-    output [63:0] WB_MEM_RESULT,
-    output [63:0] WB_PC_MUX,
-    output        WB_V,
-    output [63:0] WB_RFD,
-    output [63:0] WB_DRID,
-    output        WB_ECALL,
-    output        MEM_LAM,
-    output        MEM_LAF,
-    output        MEM_SAM,
-    output        MEM_SAF,
-    output reg MEM_PC_MUX,
-
+    output reg [63:0] WB_NPC,
+    output reg [63:0] WB_CSRFD,
+    output reg [63:0] WB_ALU_RESULT,
+    output reg [63:0] WB_MEM_RESULT,
+    output reg        WB_PC_MUX,
+    output reg        WB_V,
+    output reg [63:0] WB_RFD,
+    output reg [63:0] WB_DRID,
+    output reg        WB_ECALL,
+    output reg [31:0] MEM_IR_OLD,
+    output reg        MEM_LAM,
+    output reg        MEM_LAF,
+    output reg        MEM_SAM,
+    output reg        MEM_SAF,
 )
 
-reg branch_taken;
 
 always @(*) begin
-    case(opcode)
-        // conditional
-        7'b1100011: branch_taken = (MEM_SR1 == MEM_SR2);         // beq
-        7'b1100011: branch_taken = (MEM_SR1 != MEM_SR2);         // bne
-        7'b1100011: branch_taken = (MEM_SR1 < MEM_SR2);          // blt
-        7'b1100011: branch_taken = (MEM_SR1 >= MEM_SR2);         // bge
-        7'b1100011: branch_taken = (MEM_SR1 < MEM_SR2);          // bltu
-        7'b1100011: branch_taken = (MEM_SR1 >= MEM_SR2);         // bgeu
-            
-        // uncoditional
-        7'b1101111: branch_taken = 1;                        // jal
-        7'b1100111: branch_taken = 1;                        // jalr
-            
-        default: branch_taken = 0; // default: no branch
-    endcase
-        
-    MEM_PC_MUX = branch_taken ? 1 : 0; // branch taken = 1, 0 otherwise
+    if(MEM_IR[7:0] == 7'b1101111 || MEM_IR[7:0] == 7'b1100111)begin
+        WB_PC_MUX = 1;
+    end
+    else if(MEM_IR[7:0] == 7'b1100011)begin
+        case(MEM_IR[14:12])
+            3'b000: WB_PC_MUX = (MEM_SR1 == MEM_SR2);         // beq
+            3'b001: WB_PC_MUX = (MEM_SR1 != MEM_SR2);         // bne
+            3'b100: WB_PC_MUX = (MEM_SR1 < MEM_SR2);          // blt
+            3'b101: WB_PC_MUX = (MEM_SR1 >= MEM_SR2);         // bge
+            3'b110: WB_PC_MUX = (MEM_SR1 < MEM_SR2);          // bltu
+            3'b111: WB_PC_MUX = (MEM_SR1 >= MEM_SR2);         // bgeu
+        endcase
+    end
+    else begin
+        WB_PC_MUX = 0;
+    end
 end
 
 always @(posedge clk) begin

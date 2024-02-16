@@ -73,7 +73,7 @@ wire        mem_ecall;
 //wires from WRITEBACK stage
 wire [31:0] wb_ir;
 wire [63:0] wb_csrfd;
-wire [63:0] wb_data;
+wire [63:0] wb_rfd;
 wire [63:0] wb_alu_result;
 wire [63:0] wb_mem_result;
 wire        wb_cs;
@@ -82,6 +82,10 @@ wire [63:0] wb_st_reg;
 wire [63:0] wb_st_csr;
 wire [1:0]  wb_pc_mux_out;
 wire [63:0] wb_br_jmp_target;
+wire [63:0] wb_npc;
+wire        wb_v;
+wire [4:0]  wb_drid;
+wire        wb_ecall;
  
 
 //External wires
@@ -111,7 +115,7 @@ decode decode_stage(
     .DE_V(de_v),
     .WB_IR(wb_ir),
     .WB_CSRFD(wb_csrfd),
-    .WB_DATA(wb_data),
+    .WB_RFD(wb_rfd),
     .MEM_ALU_RESULT(mem_alu_result),
     .WB_ALU_RESULT(wb_alu_result),
     .WB_MEM_RESULT(wb_mem_result),
@@ -164,28 +168,64 @@ execute execute_stage(
 memory memory_stage(
     .CLK(CLK),
     .WB_STALL(wb_stall),
-    .MEM_NPC(mem_n),
-    .MEM_CSRFD,
-    .MEM_ALU_RESULT,
-    .MEM_SR1,
-    .MEM_SR2,
-    .MEM_V,
-    .MEM_RFD,
-    .MEM_DRID,
-    .MEM_ECALL,
-    .WB_NPC,
-    .WB_CSRFD,
-    .WB_ALU_RESULT,
-    .WB_MEM_RESULT,
-    .WB_PC_MUX,
-    .WB_V,
-    .WB_RFD,
-    .WB_DRID,
-    .WB_ECALL,
-    .MEM_LAM,
-    .MEM_LAF,
-    .MEM_SAM,
-    .MEM_SAF,
+    .MEM_NPC(mem_npc),
+    .MEM_CSRFD(mem_csrfd),
+    .MEM_ALU_RESULT(mem_alu_result),
+    .MEM_SR1(mem_sr1),
+    .MEM_SR2(mem_sr2),
+    .MEM_V(mem_v),
+    .MEM_RFD(mem_rfd),
+    .MEM_DRID(mem_drid),
+    .MEM_ECALL(mem_ecall),
+    .MEM_IR(mem_ir),
+    .WB_NPC(wb_npc),
+    .WB_CSRFD(wb_csrfd),
+    .WB_ALU_RESULT(wb_alu_result),
+    .WB_MEM_RESULT(wb_mem_result),
+    .WB_PC_MUX(wb_pc_mux),
+    .WB_V(wb_v),
+    .WB_RFD(wb_rfd),
+    .WB_DRID(wb_drid),
+    .WB_ECALL(wb_ecall),
+    .MEM_IR_OLD(mem_ir_old),
+    .MEM_LAM(),            //TODO: memory exceptions
+    .MEM_LAF(),
+    .MEM_SAM(),
+    .MEM_SAF()
+);
+
+writeback writeback_stage(
+    WB_NPC,
+WB_MEM_RESULT,
+WB_ALU_RESULT,
+WB_IR,
+MEM_PC_MUX,
+WB_V,
+WB_CSRFD,
+WB_RFD,
+WB_DRID,
+WB_ECALL,
+F_IAM,
+F_IAF,
+F_II,
+MEM_LAM,
+MEM_LAF,
+MEM_SAM,
+MEM_SAF,
+TIMER,
+EXTERNAL,
+decode
+
+WB_RF_DATA,
+WB_CSR_DATA,
+WB_BR_JMP_TARGET
+WB_DRID_OUT,
+WB_PC_MUX,
+WB_IR_OUT,
+WB_LD_REG,
+WB_ST_CSR,
+WB_CAUSE,
+WB_CS
 );
 
 
