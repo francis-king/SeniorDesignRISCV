@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
                EXE_V, EXE_RFD, MEM_PC, MEM_ALU_RESULT, MEM_IR,
-               MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, MEM_stall
+               MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, MEM_stall, MEM_ECALL, EXE_ECALL
                 );
 
 //`define func3 EXE_IR[14:12];
@@ -14,10 +14,11 @@ module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
 input clk;
 input EXE_V;
 input MEM_stall;
+input EXE_ECALL;
 input [31:0] EXE_IR;
 input [63:0] EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2;
 input [63:0] EXE_RFD;
-
+output reg MEM_ECALL;
 output reg[31:0] MEM_IR;
 output reg [63:0] MEM_PC, MEM_ALU_RESULT, MEM_SR2, MEM_SR1,
               MEM_CSRFD, MEM_RFD;
@@ -46,6 +47,7 @@ assign alu_B = EXE_ALU2;
 always @(posedge clk) begin
     if (!MEM_stall) begin
         MEM_PC <= EXE_PC;
+        MEM_ECALL <= EXE_ECALL;
         MEM_IR <= EXE_IR;
         MEM_SR1 <= EXE_ALU1;
         MEM_SR2 <= EXE_ALU2;

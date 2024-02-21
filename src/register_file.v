@@ -1,3 +1,4 @@
+`timescale 1ns / 1ps
 //Assumes 32 registers are available for use
 //Note: Not sure what DE_V is used for in datapath?
 module register_file(
@@ -7,8 +8,8 @@ module register_file(
     input [63:0] WB_DATA,
     input ST_REG,
     input reset,
-    output [63:0] out_one,
-    output [63:0] out_two,
+    output wire [63:0] out_one,
+    output wire [63:0] out_two,
     input CLK
 );
 

@@ -36,8 +36,8 @@ module trap_handler(
     input         EXTERNAL,
     input  [1:0]  PRIVILEGE,
 
-    output [63:0] CAUSE,
-    output        CS
+    output reg [63:0] CAUSE,
+    output reg       CS
     
 );
 

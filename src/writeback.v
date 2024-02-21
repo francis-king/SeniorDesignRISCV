@@ -60,6 +60,8 @@ module writeback(
     
 );
 
+wire wb_cause, wb_cs;
+
 trap_handler Thandler(
     .CLK(CLK),
     .ECALL(WB_ECALL),
@@ -73,38 +75,40 @@ trap_handler Thandler(
     .TIMER(TIMER),
     .EXTERNAL(EXTERNAL),
     .PRIVILEGE(PRIVILEGE),
-    .CAUSE(WB_CAUSE),
-    .CS(WB_CS),
+    .CAUSE(wb_cause),
+    .CS(wb_cs)
 );
 
 
 //mux for selecting data to be written to register file
 always @(*)begin
     if(WB_V)begin
-        if(IR[6:0] == 7'b0000011)begin
+        WB_CAUSE <= wb_cause;
+        WB_CAUSE <= wb_cs;
+        if(WB_IR[6:0] == 7'b0000011)begin
             WB_RF_DATA = WB_MEM_RESULT;
             WB_ST_REG = 1;
         end
-        else if(IR[6:0] == 7'b0x10011)begin
+        else if(WB_IR[6:0] == 7'b0x10011)begin
             WB_RF_DATA = WB_ALU_RESULT;
             WB_ST_REG = 1;
         end
-        else if(IR[6:0] == 1110011)begin
+        else if(WB_IR[6:0] == 1110011)begin
             WB_RF_DATA = WB_RFD;
             WB_CSR_DATA = WB_CSRFD;
             WB_ST_REG = 1;
             WB_ST_CSR = 1;
         end
-        else if(IR[6:0] == 1100111 || IR[6:0] == 1101111)begin
+        else if(WB_IR[6:0] == 1100111 || WB_IR[6:0] == 1101111)begin
             WB_RF_DATA = WB_NPC;
-            WB_LD_REG = 1;
+            WB_ST_REG = 1;
         end
         else begin
 
         end
         
         WB_BR_JMP_TARGET = WB_ALU_RESULT;
-        WB_PC_MUX = MEM_PC_MUX;
+        WB_PC_MUX_OUT = WB_PC_MUX;
         WB_IR_OUT = WB_IR;
     end
 
