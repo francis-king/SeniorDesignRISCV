@@ -1,27 +1,4 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 02/02/2024 12:55:36 PM
-// Design Name: 
-// Module Name: register_file
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: This File holds the General Purpose Registers for the core and can 
-// perform a read and write in one cycle. The 
-//
-//  
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
 //Assumes 32 registers are available for use
 //Note: Not sure what DE_V is used for in datapath?
 module register_file(
@@ -31,8 +8,8 @@ module register_file(
     input [63:0] WB_DATA,
     input ST_REG,
     input reset,
-    output [63:0] out_one,
-    output [63:0] out_two,
+    output wire [63:0] out_one,
+    output wire [63:0] out_two,
     input CLK
 );
 

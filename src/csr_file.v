@@ -32,8 +32,8 @@ module csr_file(
     input CS,
     input [63:0] CAUSE,
     input [63:0] NPC,
-    output reg [63:0] OUT,
-    output reg [63:0] MTVEC,
+    output     [63:0] OUT,
+    output reg [63:0] PC_OUT,
     output reg DE_CS,
     input CLK,
     input RESET
@@ -45,16 +45,16 @@ reg [1:0] PRIVILEGE;            //holds the privilige mode for the current threa
 wire [1:0] RETURN_PRIVILEGE;
 wire [31:0] RET;
 
-assign RETURN_PRIVILEGE = regFile[{2'b0,PRIVILEGE[1:0],8'h00}][12:11];
-assign RET = {2'b0,PRIVILEGE[3:2],28'h0200073};
+assign RETURN_PRIVILEGE = regFile[{2'b0,PRIVILEGE,8'h00}][12:11];
+assign RET = {2'b0,RETURN_PRIVILEGE,28'h0200073};
 
 always @(*) begin
     if(CS)begin
 
         regFile[{2'b0,2'b11,8'h42}] <= CAUSE;                                        //_Cause register set
-        MTVEC <= regFile[{2'b0,2'b11,8'h05}] + (4*(CAUSE[12:0]));                   //trap address in vector table
+        PC_OUT <= regFile[{2'b0,2'b11,8'h05}] + (4*(CAUSE[12:0]));                   //trap address in vector table
         regFile[{2'b0,2'b11,8'h00}][12:11] <= 2'b11;                                         //setting _status.xpp
-        regFile[{2'b0,2'b11,8'h00}][2'b11+4] <= regFile[{2'b0,2'b11,8'h00}][PRIVILEGE[3:2]]; //setting _status.xpie to _status.yie
+        regFile[{2'b0,2'b11,8'h00}][2'b11+4] <= regFile[{2'b0,2'b11,8'h00}][RETURN_PRIVILEGE]; //setting _status.xpie to _status.yie
         regFile[{2'b0,2'b11,8'h00}][2'b11] <= 0;                                             //setting _status.xie to 0
         regFile[{2'b0,2'b11,8'h41}] <= NPC;                                                  //saving PC in _PC
         PRIVILEGE <= 2'b11;
@@ -62,9 +62,9 @@ always @(*) begin
 
     end
     else if(IR == RET)begin
-        regFile[{2'b0,PRIVILEGE[1:0],8'h00}][RETURN_PRIVILEGE[1:0]] <= regFile[{2'b0,PRIVILEGE[1:0],8'h00}][PRIVILEGE[1:0]+4];  //setting _status.yie to _status.xpie
-        regFile[{2'b0,PRIVILEGE[1:0],8'h00}][PRIVILEGE[1:0]+4] <= 1;                                                            //setting _status.xie to 1
-        MTVEC <= regFile[{2'b0,PRIVILEGE[1:0],8'h41}];                                                                         //outputting _epc
+        regFile[{2'b0,PRIVILEGE,8'h00}][RETURN_PRIVILEGE] <= regFile[{2'b0,PRIVILEGE,8'h00}][PRIVILEGE+4];  //setting _status.yie to _status.xpie
+        regFile[{2'b0,PRIVILEGE,8'h00}][PRIVILEGE+4] <= 1;                                                            //setting _status.xie to 1
+        PC_OUT <= regFile[{2'b0,PRIVILEGE,8'h41}];                                                                         //outputting _epc
         PRIVILEGE <= RETURN_PRIVILEGE;
         DE_CS <= 1;                                                                                                 
 
@@ -81,8 +81,9 @@ always @(posedge CLK)begin
     else if(ST_REG)begin
         regFile[DR] <= DATA;
     end
-    OUT <= regFile[SR];
 
 end
+
+ assign OUT = regFile[SR];
 
 endmodule

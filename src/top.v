@@ -24,8 +24,8 @@ module top(
     input CLK,
     input RESET,
     input TIMER,
-    input UART_INT;
-)
+    input UART_INT
+);
 //stall signals
 wire v_de_br_stall;
 wire mem_stall;
@@ -61,9 +61,7 @@ wire        exe_ecall;
 wire [63:0] mem_ir_old;
 wire [4:0]  mem_drid;
 wire [63:0] mem_alu_result;
-wire        mem_stall;
 wire [63:0] mem_pc;
-wire [63:0] mem_alu_result;
 wire [31:0] mem_ir;
 wire [63:0] mem_sr2;
 wire [63:0] mem_sr1;
@@ -138,12 +136,11 @@ decode decode_stage(
     .MEM_DRID(mem_drid),
     .WB_ST_REG(wb_st_reg),
     .WB_ST_CSR(wb_st_csr),
-    .WB_IR(wb_ir),
     .MEM_STALL(mem_stall),
     .CLK(CLK),
     .reset(RESET),
     .EXE_NPC(exe_npc),
-    .EXE_CSFR(exe_csrfd),
+    .EXE_CSFRD(exe_csrfd),
     .EXE_ALU_ONE(exe_alu_one),
     .EXE_ALU_TWO(exe_alu_two),
     .EXE_IR(exe_ir),
@@ -155,11 +152,11 @@ decode decode_stage(
 );
 
 execute execute_stage(
-    .CLK(CLK),
+    .clk(CLK),
     .EXE_NPC(exe_npc),
-    .EXE_CSFR(exe_csrfd),
-    .EXE_ALU_ONE(exe_alu_one),
-    .EXE_ALU_TWO(exe_alu_two),
+    .EXE_CSRFD(exe_csrfd),
+    .EXE_ALU1(exe_alu_one),
+    .EXE_ALU2(exe_alu_two),
     .EXE_IR(exe_ir),
     .EXE_V(exe_v),
     .EXE_ECALL(exe_ecall),
@@ -189,6 +186,7 @@ memory memory_stage(
     .MEM_DRID(mem_drid),
     .MEM_ECALL(mem_ecall),
     .MEM_IR(mem_ir),
+    .WB_IR(wb_ir),
     .WB_NPC(wb_npc),
     .WB_CSRFD(wb_csrfd),
     .WB_ALU_RESULT(wb_alu_result),
@@ -227,11 +225,11 @@ writeback writeback_stage(
     .EXTERNAL(UART_INT),
     .WB_RF_DATA(wb_rf),
     .WB_CSR_DATA(wb_csr_data),
-    .WB_BR_JMP_TARGET(wb_br_jmp_target)
+    .WB_BR_JMP_TARGET(wb_br_jmp_target),
     .WB_DRID_OUT(wb_drid_out),
     .WB_PC_MUX_OUT(wb_pc_mux_out),
     .WB_IR_OUT(wb_ir_out),
-    .WB_LD_REG(wb_st_reg),
+    .WB_ST_REG(wb_st_reg),
     .WB_ST_CSR(wb_st_csr),
     .WB_CAUSE(wb_cause),
     .WB_CS(wb_cs)

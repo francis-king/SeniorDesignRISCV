@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module fetch (
     input mem_stall,
     input WB_PC_MUX,
@@ -20,7 +22,7 @@ module fetch (
 `define opcode DE_IR[6:0]
 `define func3 DE_IR[14:12]
 reg [63:0] FE_PC;
-reg [31:0] FE_instruction;
+wire [31:0] FE_instruction;
 wire FE_LD_PC, FE_LD_DE;
 wire [63:0] FE_PC_input;
 wire icache_r;
@@ -38,7 +40,7 @@ always @(posedge CLK) begin
 end
 
 
-instruction_cache a0 (.PC(FE_PC), .cache_hit(icache_r), .instruction(FE_instruction));
+instruction_cache a0 (.PC(FE_PC), .icache_r(icache_r), .instruction(FE_instruction));
 
 assign F_IAF = ~icache_r;
 assign FE_II = ((`opcode == 7'b0110111) || (`opcode == 7'b0010111) || (`opcode == 7'b1101111) || ((`opcode == 7'b1100111) && (`func3 == 3'b000)) || (`opcode == 7'b1100011) || ((`opcode == 7'b0000011) && (`func3 != 3'b111)) || ((`opcode == 7'b0100011) && (DE_IR[14] == 1'b0)) || (`opcode == 7'b0010011) || (`opcode == 7'b0110011) || (`opcode == 7'b0001111) || (`opcode == 7'b1110011) || ((`opcode == 7'b0011011) && ((`func3 == 3'b001) || (`func3 == 3'b101) || (`func3 == 3'b000))) || ((`opcode == 7'b0111011) && ((`func3 == 3'b001) || (`func3 == 3'b101) || (`func3 == 3'b000))) || (`opcode == 7'b1110011) || (`opcode == 7'b0110011) || (`opcode == 7'b0111011)) ? 1'b0 : 1'b1;

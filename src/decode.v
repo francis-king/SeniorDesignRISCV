@@ -58,8 +58,8 @@ module decode (
 `define func3 DE_IR[14:12]
 `define opcode DE_IR[6:0]
 wire DE_MEM_ALU_SR, DE_WB_ALU_SR, DE_WB_MEM_SR, LD_AGEX;
-reg [63:0] de_reg_out_one, de_reg_out_two, de_ALU1_out, de_ALU2_reg_out, exe_alu_in, de_ALU2_imm_out;
-
+reg [63:0]  de_ALU1_out, de_ALU2_reg_out, exe_alu_in, de_ALU2_imm_out;
+wire [63:0] de_reg_out_one, de_reg_out_two, exe_rfd_latch;
 register_file regFile (
     .DR(WB_IR[11:7]), 
     .SR1(DE_IR[19:15]), 
@@ -80,7 +80,7 @@ csr_file csr(
     .CS(WB_CS),
     .CAUSE(WB_CAUSE),
     .NPC(DE_NPC),
-    .OUT(EXE_RFD),
+    .OUT(exe_rfd_latch),
     .PC_OUT(DE_MTVEC),
     .CLK(CLK)
     );
@@ -156,6 +156,7 @@ assign LD_AGEX = !MEM_STALL;
 assign EXE_V_in = DE_V && !MEM_STALL;
 always @(posedge clk) begin
     if (LD_AGEX) begin
+        EXE_RFD <= exe_rfd_latch;
         EXE_NPC <= DE_NPC; 
         EXE_CSFRD <= de_ALU1_out;
         EXE_ALU_ONE <= de_ALU1_out;

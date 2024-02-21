@@ -39,6 +39,7 @@ module memory(
 
 
     output reg [63:0] WB_NPC,
+    output reg [31:0] WB_IR,
     output reg [63:0] WB_CSRFD,
     output reg [63:0] WB_ALU_RESULT,
     output reg [63:0] WB_MEM_RESULT,
@@ -51,8 +52,8 @@ module memory(
     output reg        MEM_LAM,
     output reg        MEM_LAF,
     output reg        MEM_SAM,
-    output reg        MEM_SAF,
-)
+    output reg        MEM_SAF
+);
 
 
 always @(*) begin
@@ -74,16 +75,14 @@ always @(*) begin
     end
 end
 
-always @(posedge clk) begin
-    if (!WB_stall) begin
-        WB_PC <= EXE_PC;
+always @(posedge CLK) begin
+    if (!WB_STALL) begin
+        WB_NPC <= MEM_NPC;
         WB_ALU_RESULT <= WB_ALU_RESULT;
-        WB_IR <= EXE_IR;
-        WB_SR1 <= EXE_ALU1;
-        WB_SR2 <= EXE_ALU2;
-        WB_CSRFD <= EXE_CSRFD;
-        WB_RFD <= EXE_RFD;
-        WB_V <= EXE_V;
+        WB_IR <= MEM_IR;
+        WB_CSRFD <= MEM_CSRFD;
+        WB_RFD <= MEM_RFD;
+        WB_V <= MEM_V;
     end
 end
 
