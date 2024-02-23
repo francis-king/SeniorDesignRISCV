@@ -14,9 +14,9 @@ module fetch (
     output reg [63:0] DE_NPC,
     output reg [31:0] DE_IR,
     output reg DE_V,
-    output F_IAM,
-    output F_IAF,
-    output F_II
+    output FE_IAM,
+    output FE_IAF,
+    output FE_II
 );
 
 `define opcode DE_IR[6:0]
@@ -33,16 +33,16 @@ always @(posedge CLK) begin
         FE_PC <= FE_PC_input;
     end
     if (FE_LD_DE) begin
-        DE_V = icache_r && !v_de_br_stall && !v_agex_br_stall && !v_mem_br_stall;
-        DE_IR = FE_instruction;
-        DE_NPC = FE_PC + 4;
+        DE_V <= icache_r && !v_de_br_stall && !v_agex_br_stall && !v_mem_br_stall;
+        DE_IR <= FE_instruction;
+        DE_NPC <= FE_PC + 4;
     end
 end
 
 
-instruction_cache a0 (.PC(FE_PC), .icache_r(icache_r), .instruction(FE_instruction));
+instruction_cache a0 (.PC(FE_PC), .icache_r(icache_r), .instruction(FE_instruction), .CLK(CLK), .reset(RESET));
 
-assign F_IAF = ~icache_r;
+assign FE_IAF = ~icache_r;
 assign FE_II = ((`opcode == 7'b0110111) || (`opcode == 7'b0010111) || (`opcode == 7'b1101111) || ((`opcode == 7'b1100111) && (`func3 == 3'b000)) || (`opcode == 7'b1100011) || ((`opcode == 7'b0000011) && (`func3 != 3'b111)) || ((`opcode == 7'b0100011) && (DE_IR[14] == 1'b0)) || (`opcode == 7'b0010011) || (`opcode == 7'b0110011) || (`opcode == 7'b0001111) || (`opcode == 7'b1110011) || ((`opcode == 7'b0011011) && ((`func3 == 3'b001) || (`func3 == 3'b101) || (`func3 == 3'b000))) || ((`opcode == 7'b0111011) && ((`func3 == 3'b001) || (`func3 == 3'b101) || (`func3 == 3'b000))) || (`opcode == 7'b1110011) || (`opcode == 7'b0110011) || (`opcode == 7'b0111011)) ? 1'b0 : 1'b1;
 assign FE_IAM = (FE_PC & 64'd3) == 0 ? 1'b0 : 1'b1;
 
