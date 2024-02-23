@@ -32,6 +32,7 @@ module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
 `define func3 EXE_IR[14:12]
 `define func7 EXE_IR[31:25]
 input clk;
+input reset;
 input EXE_V;
 input MEM_STALL;
 input RESET;

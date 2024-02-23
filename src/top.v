@@ -33,9 +33,9 @@ wire wb_stall;
 
 
 //wires from FETCH stage
-wire f_iam;
-wire f_iaf;
-wire f_ii;
+wire fe_iam;
+wire fe_iaf;
+wire fe_ii;
 
 //wires from DECODE stage
 wire [63:0] de_mtvec;
@@ -101,6 +101,7 @@ wire [63:0] wb_rf_data;
 
 
 fetch fetch_stage(
+    .mem_stall(mem_stall),
     .WB_PC_MUX(wb_pc_mux_out),
     .WB_BR_JMP_PC(wb_br_jmp_pc),
     .DE_MTVEC(de_mtvec),
@@ -113,9 +114,9 @@ fetch fetch_stage(
     .DE_NPC(de_npc),
     .DE_IR(de_ir),
     .DE_V(de_v),
-    .F_IAM(f_iam),
-    .F_IAF(f_iaf),
-    .F_II(f_ii)
+    .FE_IAM(fe_iam),
+    .FE_IAF(fe_iaf),
+    .FE_II(fe_ii)
 );
 
 decode decode_stage(
@@ -153,6 +154,7 @@ decode decode_stage(
 
 execute execute_stage(
     .clk(CLK),
+    .reset(RESET),
     .EXE_NPC(exe_npc),
     .EXE_CSRFD(exe_csrfd),
     .EXE_ALU1(exe_alu_one),
@@ -175,8 +177,10 @@ execute execute_stage(
 
 memory memory_stage(
     .CLK(CLK),
+    .RESET(RESET),
     .WB_STALL(wb_stall),
     .MEM_NPC(mem_npc),
+    .MEM_STALL(mem_stall),
     .MEM_CSRFD(mem_csrfd),
     .MEM_ALU_RESULT(mem_alu_result),
     .MEM_SR1(mem_sr1),
@@ -214,9 +218,9 @@ writeback writeback_stage(
     .WB_RFD(wb_rfd),
     .WB_DRID(wb_drid),
     .WB_ECALL(wb_ecall),
-    .F_IAM(f_iam),
-    .F_IAF(f_iaf),
-    .F_II(f_ii),
+    .FE_IAM(fe_iam),
+    .FE_IAF(fe_iaf),
+    .FE_II(fe_ii),
     .MEM_LAM(mem_lam),
     .MEM_LAF(mem_laf),
     .MEM_SAM(mem_sam),

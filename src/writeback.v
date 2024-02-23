@@ -35,9 +35,9 @@ module writeback(
     input [63:0] WB_RFD,
     input [4:0]  WB_DRID,
     input        WB_ECALL,
-    input        F_IAM,
-    input        F_IAF,
-    input        F_II,
+    input        FE_IAM,
+    input        FE_IAF,
+    input        FE_II,
     input        MEM_LAM,
     input        MEM_LAF,
     input        MEM_SAM,
@@ -81,7 +81,7 @@ trap_handler Thandler(
 
 
 //mux for selecting data to be written to register file
-always @(*)begin
+always @(posedge CLK)begin
     if(WB_V)begin
         WB_CAUSE <= wb_cause;
         WB_CS <= wb_cs;
