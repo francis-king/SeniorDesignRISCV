@@ -1,0 +1,18 @@
+.ORIG xffff0000
+
+jal x1, x80000000
+jal x1, x80001000
+jal x1, x80002000
+jal x1, x80003000
+jal x1, x80004000
+jal x1, x80005000
+jal x1, x80006000
+jal x1, x80007000
+jal x1, x80008000
+jal x1, x80009000
+jal x1, x8000A000
+jal x1, x8000B000
+jal x1, x8000C000
+
+
+.end

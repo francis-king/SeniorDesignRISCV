@@ -23,7 +23,6 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 module decode (
-    input clk,
     input [63:0] DE_NPC,
     input [31:0] DE_IR,
     input DE_V,
@@ -154,7 +153,7 @@ assign v_de_br_stall = (`opcode == 7'b1100011) ? 1'd1 : 1'd0;
 assign EXE_ECALL_in = (DE_IR == 32'h00000073) ? 1'd1 : 1'd0;
 assign LD_AGEX = !MEM_STALL;
 assign EXE_V_in = DE_V && !MEM_STALL;
-always @(posedge clk) begin
+always @(posedge CLK) begin
     if (LD_AGEX) begin
         EXE_RFD <= exe_rfd_latch;
         EXE_NPC <= DE_NPC; 
