@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
                EXE_V, EXE_RFD, MEM_PC, MEM_ALU_RESULT, MEM_IR,
-               MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, MEM_stall, MEM_ECALL, EXE_ECALL
+               MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD, clk, reset, MEM_stall, MEM_ECALL, EXE_ECALL
                 );
 
 //`define func3 EXE_IR[14:12];
@@ -12,6 +12,7 @@ module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
 `define func3 EXE_IR[14:12]
 `define func7 EXE_IR[31:25]
 input clk;
+input reset;
 input EXE_V;
 input MEM_stall;
 input EXE_ECALL;

@@ -25,6 +25,7 @@
 
 module memory(
     input        CLK,
+    input        RESET,
     input        WB_STALL,
     input [63:0] MEM_NPC,
     input [63:0] MEM_CSRFD,
@@ -52,7 +53,8 @@ module memory(
     output reg        MEM_LAM,
     output reg        MEM_LAF,
     output reg        MEM_SAM,
-    output reg        MEM_SAF
+    output reg        MEM_SAF,
+    output reg        MEM_STALL
 );
 
 
@@ -62,7 +64,9 @@ always @(*) begin
     end
     else if(MEM_IR[7:0] == 7'b1100011)begin
         case(MEM_IR[14:12])
-            3'b000: WB_PC_MUX = (MEM_SR1 == MEM_SR2);         // beq
+            3'b000: begin
+                WB_PC_MUX = (MEM_SR1 == MEM_SR2);         // beq
+            end
             3'b001: WB_PC_MUX = (MEM_SR1 != MEM_SR2);         // bne
             3'b100: WB_PC_MUX = (MEM_SR1 < MEM_SR2);          // blt
             3'b101: WB_PC_MUX = (MEM_SR1 >= MEM_SR2);         // bge
@@ -76,13 +80,18 @@ always @(*) begin
 end
 
 always @(posedge CLK) begin
-    if (!WB_STALL) begin
-        WB_NPC <= MEM_NPC;
-        WB_ALU_RESULT <= WB_ALU_RESULT;
-        WB_IR <= MEM_IR;
-        WB_CSRFD <= MEM_CSRFD;
-        WB_RFD <= MEM_RFD;
-        WB_V <= MEM_V;
+    if(RESET) begin 
+        MEM_STALL <= 1'b0;
+    end
+    else begin
+        if (!WB_STALL) begin
+            WB_NPC <= MEM_NPC;
+            WB_ALU_RESULT <= WB_ALU_RESULT;
+            WB_IR <= MEM_IR;
+            WB_CSRFD <= MEM_CSRFD;
+            WB_RFD <= MEM_RFD;
+            WB_V <= MEM_V;
+        end        
     end
 end
 
