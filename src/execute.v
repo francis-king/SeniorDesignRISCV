@@ -1,7 +1,27 @@
 `timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 02/23/2024 12:49:36 PM
+// Design Name: 
+// Module Name: execute
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
 module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
-               EXE_V, EXE_RFD, MEM_PC, MEM_ALU_RESULT, MEM_IR,
-               MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, MEM_stall, MEM_ECALL, EXE_ECALL
+               EXE_V, EXE_RFD, MEM_NPC, MEM_ALU_RESULT, MEM_IR,
+               MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, MEM_STALL, MEM_ECALL, EXE_ECALL, RESET
                 );
 
 //`define func3 EXE_IR[14:12];
@@ -13,14 +33,15 @@ module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
 `define func7 EXE_IR[31:25]
 input clk;
 input EXE_V;
-input MEM_stall;
+input MEM_STALL;
+input RESET;
 input EXE_ECALL;
 input [31:0] EXE_IR;
 input [63:0] EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2;
 input [63:0] EXE_RFD;
 output reg MEM_ECALL;
 output reg[31:0] MEM_IR;
-output reg [63:0] MEM_PC, MEM_ALU_RESULT, MEM_SR2, MEM_SR1,
+output reg [63:0] MEM_NPC, MEM_ALU_RESULT, MEM_SR2, MEM_SR1,
               MEM_CSRFD, MEM_RFD;
 output reg MEM_V;
 
@@ -45,8 +66,21 @@ assign alu_A = ((`opcode == 7'b0000011) || (`opcode == 0010111) ||
 assign alu_B = EXE_ALU2;
 
 always @(posedge clk) begin
-    if (!MEM_stall) begin
-        MEM_PC <= EXE_PC;
+    if(RESET)begin
+        MEM_NPC <= 0;
+        MEM_ECALL <= 0;
+        MEM_IR <= 0;
+        MEM_SR1 <= 0;
+        MEM_SR2 <= 0;
+        MEM_CSRFD <= 0;
+        MEM_RFD <= 0;
+        MEM_V <= 0;
+        MEM_ALU_RESULT <= 0;
+        
+    end
+    else begin
+    if (!MEM_STALL) begin
+        MEM_NPC <= EXE_NPC;
         MEM_ECALL <= EXE_ECALL;
         MEM_IR <= EXE_IR;
         MEM_SR1 <= EXE_ALU1;
@@ -224,7 +258,7 @@ always @(posedge clk) begin
     end
     end
 end
-
+end
 reg [63:0] csrresult = 0;
 always @(*) begin
     case(EXE_IR[13:12]) 
@@ -234,6 +268,5 @@ always @(*) begin
         default: ;
     endcase
 end
-
 
 endmodule
