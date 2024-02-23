@@ -35,9 +35,9 @@ module writeback(
     input [63:0] WB_RFD,
     input [4:0]  WB_DRID,
     input        WB_ECALL,
-    input        F_IAM,
-    input        F_IAF,
-    input        F_II,
+    input        FE_IAM,
+    input        FE_IAF,
+    input        FE_II,
     input        MEM_LAM,
     input        MEM_LAF,
     input        MEM_SAM,
@@ -81,15 +81,15 @@ trap_handler Thandler(
 
 
 //mux for selecting data to be written to register file
-always @(*)begin
+always @(posedge CLK)begin
     if(WB_V)begin
         WB_CAUSE <= wb_cause;
-        WB_CAUSE <= wb_cs;
+        WB_CS <= wb_cs;
         if(WB_IR[6:0] == 7'b0000011)begin
             WB_RF_DATA = WB_MEM_RESULT;
             WB_ST_REG = 1;
         end
-        else if(WB_IR[6:0] == 7'b0x10011)begin
+        else if(WB_IR[6:0] == 7'b0010011 || WB_IR[6:0] == 7'b0110011)begin
             WB_RF_DATA = WB_ALU_RESULT;
             WB_ST_REG = 1;
         end
@@ -110,6 +110,7 @@ always @(*)begin
         WB_BR_JMP_TARGET = WB_ALU_RESULT;
         WB_PC_MUX_OUT = WB_PC_MUX;
         WB_IR_OUT = WB_IR;
+        WB_DRID_OUT = WB_DRID;
     end
 
 end
