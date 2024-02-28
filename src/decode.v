@@ -1,28 +1,12 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 02/02/2024 12:55:36 PM
-// Design Name: 
-// Module Name: decode
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: This file decodes the instructions and retrieves and data needed
-//from the register file and creates the arguments and control signals for the 
-//execute and memory stages.
-//  
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 
+<<<<<<< Updated upstream
 module decode (
+=======
+module decode (   
+    input        CLK,
+    input        RESET,
+>>>>>>> Stashed changes
     input [63:0] DE_NPC,
     input [31:0] DE_IR,
     input DE_V,
@@ -36,15 +20,12 @@ module decode (
     input [63:0] WB_CAUSE,
     input [63:0] EXE_IR_OLD,
     input [63:0] MEM_IR_OLD,
-    input [4:0] EXE_DRID,
-    input [4:0] MEM_DRID,
     input WB_ST_REG,
     input WB_ST_CSR,
     input MEM_STALL,
-    input CLK,
-    input reset,
+    
     output reg [31:0] EXE_NPC,
-    output reg [63:0] EXE_CSFRD,
+    output reg [63:0] EXE_CSRFD,
     output reg [63:0] EXE_ALU_ONE,
     output reg [63:0] EXE_ALU_TWO,
     output reg [31:0] EXE_IR,
@@ -84,10 +65,6 @@ csr_file csr(
     .CLK(CLK)
     );
 
-
-
-
-
 //DE_ALU1_MUX
 always @(*) begin
     if ((DE_IR[14] == 1) && (DE_IR[6:0] == 7'b1110011)) begin
@@ -116,9 +93,9 @@ always @(*) begin
     end
 end
 
-assign DE_MEM_ALU_SR = ((EXE_DRID == DE_IR[19:15]) && !EXE_IR_OLD[6] && EXE_IR_OLD[4]) ? 'd1 : 'd0;
-assign DE_WB_MEM_SR = ((MEM_DRID == DE_IR[19:15]) && !MEM_IR_OLD[6] && !MEM_IR_OLD[4]) ? 'd1 : 'd0;
-assign DE_WB_ALU_SR = ((MEM_DRID == DE_IR[19:15]) && !MEM_IR_OLD[6] && MEM_IR_OLD[4]) ? 'd1 : 'd0;
+assign DE_MEM_ALU_SR = ((EXE_IR_OLD[11:7] == DE_IR[19:15]) && !EXE_IR_OLD[6] && EXE_IR_OLD[4]) ? 'd1 : 'd0;
+assign DE_WB_MEM_SR = ((MEM_IR_OLD[11:7] == DE_IR[19:15]) && !MEM_IR_OLD[6] && !MEM_IR_OLD[4]) ? 'd1 : 'd0;
+assign DE_WB_ALU_SR = ((MEM_IR_OLD[11:7] == DE_IR[19:15]) && !MEM_IR_OLD[6] && MEM_IR_OLD[4]) ? 'd1 : 'd0;
 
 
 always @(*) begin
@@ -151,13 +128,26 @@ end
 
 assign v_de_br_stall = (`opcode == 7'b1100011) ? 1'd1 : 1'd0;
 assign EXE_ECALL_in = (DE_IR == 32'h00000073) ? 1'd1 : 1'd0;
-assign LD_AGEX = !MEM_STALL;
+assign LD_AGEX = DE_V && !MEM_STALL;
 assign EXE_V_in = DE_V && !MEM_STALL;
 always @(posedge CLK) begin
+<<<<<<< Updated upstream
     if (LD_AGEX) begin
+=======
+    if (RESET) begin
+        EXE_NPC <= 'd0;
+        EXE_CSRFD <= 'd0;
+        EXE_ALU_ONE <= 'd0;
+        EXE_ALU_TWO <= 'd0;
+        EXE_IR <= 'd0;
+        EXE_V <= 'd0;
+        EXE_ECALL <= 'd0;
+        EXE_RFD <= 'd0;
+    end else if (LD_AGEX) begin
+>>>>>>> Stashed changes
         EXE_RFD <= exe_rfd_latch;
         EXE_NPC <= DE_NPC; 
-        EXE_CSFRD <= de_ALU1_out;
+        EXE_CSRFD <= de_ALU1_out;
         EXE_ALU_ONE <= de_ALU1_out;
         EXE_ALU_TWO <= exe_alu_in;
         EXE_IR <= DE_IR;
