@@ -48,7 +48,7 @@ wire [31:0] RET;
 assign RETURN_PRIVILEGE = regFile[{2'b0,PRIVILEGE,8'h00}][12:11];
 assign RET = {2'b0,RETURN_PRIVILEGE,28'h0200073};
 
-always @(*) begin
+always @(posedge CLK) begin
     if(CS)begin
 
         regFile[{2'b0,2'b11,8'h42}] <= CAUSE;                                        //_Cause register set
@@ -76,6 +76,9 @@ end
 always @(posedge CLK)begin
     if(RESET)begin
         PRIVILEGE <= 0;
+        OUT <= 0;
+        PC_OUT <= 0;
+        DE_CS <= 0;
         //TODO: reset misa and mhartid registers
     end
     else if(ST_REG)begin

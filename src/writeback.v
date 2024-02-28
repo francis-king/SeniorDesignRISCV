@@ -88,10 +88,12 @@ always @(posedge CLK)begin
         if(WB_IR[6:0] == 7'b0000011)begin
             WB_RF_DATA = WB_MEM_RESULT;
             WB_ST_REG = 1;
+            WB_ST_CSR = 0;
         end
         else if(WB_IR[6:0] == 7'b0010011 || WB_IR[6:0] == 7'b0110011)begin
             WB_RF_DATA = WB_ALU_RESULT;
             WB_ST_REG = 1;
+            WB_ST_CSR = 0;
         end
         else if(WB_IR[6:0] == 1110011)begin
             WB_RF_DATA = WB_RFD;
@@ -102,6 +104,7 @@ always @(posedge CLK)begin
         else if(WB_IR[6:0] == 1100111 || WB_IR[6:0] == 1101111)begin
             WB_RF_DATA = WB_NPC;
             WB_ST_REG = 1;
+            WB_ST_CSR = 0;
         end
         else begin
 
