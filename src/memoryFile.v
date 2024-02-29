@@ -5,6 +5,7 @@ module memoryFile (
     input CLK,
     input reset,
     input we,
+    input [1:0] size,
     input [63:0] mem_data,
     input [63:0] address,
     output v_mem_stall,
@@ -34,14 +35,26 @@ always @(posedge CLK) begin
         end
     end else begin
         if (we && MEM_V) begin
-            memory[{address[3], 3'b111}] <= mem_data[63:56];
-            memory[{address[3], 3'b110}] <= mem_data[55:48];
-            memory[{address[3], 3'b101}] <= mem_data[47:40];
-            memory[{address[3], 3'b100}] <= mem_data[39:32];
-            memory[{address[3], 3'b011}] <= mem_data[31:24];
-            memory[{address[3], 3'b010}] <= mem_data[23:16];
-            memory[{address[3], 3'b001}] <= mem_data[15:8];
-            memory[{address[3], 3'b000}] <= mem_data[7:0];
+            if (size == 2'b00) begin
+                memory[{address[3], 3'b000}] <= mem_data[7:0];
+            end else if (size == 2'b01) begin
+                memory[{address[3], 3'b001}] <= mem_data[15:8];
+                memory[{address[3], 3'b000}] <= mem_data[7:0];
+            end else if (size == 2'b10) begin
+                memory[{address[3], 3'b011}] <= mem_data[31:24];
+                memory[{address[3], 3'b010}] <= mem_data[23:16];
+                memory[{address[3], 3'b001}] <= mem_data[15:8];
+                memory[{address[3], 3'b000}] <= mem_data[7:0];
+            end else if (size == 2'b11) begin
+                memory[{address[3], 3'b111}] <= mem_data[63:56];
+                memory[{address[3], 3'b110}] <= mem_data[55:48];
+                memory[{address[3], 3'b101}] <= mem_data[47:40];
+                memory[{address[3], 3'b100}] <= mem_data[39:32];
+                memory[{address[3], 3'b011}] <= mem_data[31:24];
+                memory[{address[3], 3'b010}] <= mem_data[23:16];
+                memory[{address[3], 3'b001}] <= mem_data[15:8];
+                memory[{address[3], 3'b000}] <= mem_data[7:0];
+            end
         end
     end
 end

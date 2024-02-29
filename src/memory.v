@@ -57,7 +57,15 @@ module memory(
     output reg        V_MEM_STALL
 );
 
-assign V_MEM_STALL = 1'b1 && MEM_V;
+wire [63:0] data_out, data;
+wire [1:0] size;
+assign we = (MEM_IR[6:0] == 6'b0100011);
+assign size = (MEM_IR[14:12] == 3'b000) ? 2'b00 : (MEM_IR[14:12] == 3'b001) ? 2'b01 : (MEM_IR[14:12] == 3'b010) ? 2'b10 : 2'b11;
+memoryFile m0 (.MEM_V(MEM_V), .CLK(CLK), .reset(RESET), .we(we), .size(size), .mem_data(mem_data), .address(WB_ALU_RESULT), .v_mem_stall(V_MEM_STALL), .data_out(data));
+
+
+assign data_out = (MEM_IR[14:12] == 3'b000) ? (data&(64'h0FF)) : (MEM_IR[14:12] == 3'b001) ? (data&(64'h0FFFF)) : (MEM_IR[14:12] == 3'b010) ? (data&(64'h0FFFFFFFF)) : (MEM_IR[14:12] == 3'b011) ? data : (MEM_IR[14:12] == 3'b100) ? ((data&(64'h0FF))<<8) : (MEM_IR[14:12] == 3'b101) ? ((data&(64'h0FFFF))<<16) : ((data&(64'h0FFFFFFFF))<<32);
+
 always @(posedge CLK) begin
     if(RESET) begin 
         WB_V <= 1'b0;
@@ -66,7 +74,7 @@ always @(posedge CLK) begin
         if (!WB_STALL) begin
             WB_NPC <= MEM_NPC;
             WB_ALU_RESULT <= MEM_ALU_RESULT;
-            WB_MEM_RESULT <= MEM_ALU_RESULT;
+            WB_MEM_RESULT <= data_out;
             WB_IR <= MEM_IR;
             WB_CSRFD <= MEM_CSRFD;
             WB_RFD <= MEM_RFD;
