@@ -46,7 +46,7 @@ always @(posedge CLK) begin
     end
 end
 
-assign data = {memory[{address[3],3'b111}], memory[{address[3],3'b110}], memory[{address[3],3'b101}], memory[{address[3],3'b100}], memory[{address[3],3'b011}], memory[{address[3],3'b010}], memory[{address[3],3'b001}], memory[{address[3],3'b000}]};
+assign data_out = {memory[{address[3],3'b111}], memory[{address[3],3'b110}], memory[{address[3],3'b101}], memory[{address[3],3'b100}], memory[{address[3],3'b011}], memory[{address[3],3'b010}], memory[{address[3],3'b001}], memory[{address[3],3'b000}]};
 
 //add in code to talk to memory bus
 
