@@ -1,13 +1,12 @@
-# ~/SeniorDesignRISCV/src/csr_file.v
-# ~/SeniorDesignRISCV/src/decode.v
-# ~/SeniorDesignRISCV/src/execute.v
-# ~/SeniorDesignRISCV/src/instruction_cache.v
-# ~/SeniorDesignRISCV/src/memory.v
-# ~/SeniorDesignRISCV/src/register_file.v
-# ~/SeniorDesignRISCV/src/top.v
-# ~/SeniorDesignRISCV/src/trap_handler.v
-# ~/SeniorDesignRISCV/src/writeback.v
-# ~/SeniorDesignRISCV/src/fetch.v
+~/SeniorDesignRISCV/src/csr_file.v
+~/SeniorDesignRISCV/src/decode.v
+~/SeniorDesignRISCV/src/execute.v
+~/SeniorDesignRISCV/src/instruction_cache.v
+~/SeniorDesignRISCV/src/memory.v
+~/SeniorDesignRISCV/src/register_file.v
+~/SeniorDesignRISCV/src/top.v
+~/SeniorDesignRISCV/src/trap_handler.v
+~/SeniorDesignRISCV/src/writeback.v
+~/SeniorDesignRISCV/src/fetch.v
 ~/SeniorDesignRISCV/src/memoryFile.v
-~/SeniorDesignRISCV/Testbenches/memoryFile_tb.v
-# ~/SeniorDesignRISCV/Testbenches/tb_top.v
+~/SeniorDesignRISCV/Testbenches/tb_top.v

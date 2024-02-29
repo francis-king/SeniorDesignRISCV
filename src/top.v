@@ -46,9 +46,9 @@ wire        de_v;
 wire [1:0] privilige;
 
 //wires from EXECUTE stage
-wire [63:0] exe_ir_old;
+wire [31:0] exe_ir_old;
 wire [4:0]  exe_drid;
-wire [31:0] exe_npc; 
+wire [63:0] exe_npc; 
 wire [63:0] exe_csrfd; 
 wire [63:0] exe_alu_one; 
 wire [63:0] exe_alu_two; 
@@ -58,8 +58,7 @@ wire        exe_valid;
 wire        exe_ecall; 
 
 //wires from MEMORY stage
-wire [63:0] mem_ir_old;
-wire [4:0]  mem_drid;
+wire [31:0] mem_ir_old;
 wire [63:0] mem_alu_result;
 wire [63:0] mem_npc;
 wire [31:0] mem_ir;
@@ -83,7 +82,7 @@ wire [63:0] wb_alu_result;
 wire [63:0] wb_mem_result;
 wire        wb_cs;
 wire [63:0] wb_cause;
-wire [63:0] wb_st_reg;
+wire wb_st_reg;
 wire [63:0] wb_st_csr;
 wire        wb_pc_mux_out;
 wire        wb_pc_mux;
@@ -103,7 +102,7 @@ wire [63:0] wb_rf_data;
 fetch fetch_stage(
     .v_mem_stall(v_mem_stall),
     .WB_PC_MUX(wb_pc_mux_out),
-    .WB_BR_JMP_PC(wb_br_jmp_pc),
+    .WB_BR_JMP_PC(wb_br_jmp_target),
     .DE_MTVEC(de_mtvec),
     .DE_CS(de_cs),
     .v_de_br_stall(v_de_br_stall),      //TODO: figure out stall
@@ -187,7 +186,6 @@ memory memory_stage(
     .MEM_SR2(mem_sr2),
     .MEM_V(mem_v),
     .MEM_RFD(mem_rfd),
-    .MEM_DRID(mem_drid),
     .MEM_ECALL(mem_ecall),
     .MEM_IR(mem_ir),
     .WB_IR(wb_ir),
@@ -214,7 +212,7 @@ writeback writeback_stage(
     .WB_MEM_RESULT(wb_mem_result),
     .WB_ALU_RESULT(wb_alu_result),
     .WB_IR(wb_ir),
-    .WB_PC_MUX(MEM_PC_MUX),
+    .WB_PC_MUX(wb_pc_mux),
     .WB_V(wb_v),
     .WB_CSRFD(wb_csrfd),
     .WB_RFD(wb_rfd),
@@ -228,7 +226,7 @@ writeback writeback_stage(
     .MEM_SAF(mem_saf),
     .TIMER(TIMER),
     .EXTERNAL(UART_INT),
-    .WB_RF_DATA(wb_rf),
+    .WB_RF_DATA(wb_rf_data),
     .WB_CSR_DATA(wb_csr_data),
     .WB_BR_JMP_TARGET(wb_br_jmp_target),
     .WB_DRID_OUT(wb_drid_out),
