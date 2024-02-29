@@ -9,4 +9,5 @@
 # ~/SeniorDesignRISCV/src/writeback.v
 # ~/SeniorDesignRISCV/src/fetch.v
 ~/SeniorDesignRISCV/src/memoryFile.v
+~/SeniorDesignRISCV/Testbenches/memoryFile_tb.v
 # ~/SeniorDesignRISCV/Testbenches/tb_top.v
