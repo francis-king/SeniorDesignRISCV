@@ -1,6 +1,1 @@
-/home/ecelrc/students/wzhu1/SeniorDesignRISCV/src/csr_file.v
-/home/ecelrc/students/wzhu1/SeniorDesignRISCV/src/decode.v
-/home/ecelrc/students/wzhu1/SeniorDesignRISCV/src/execute.v
-/home/ecelrc/students/wzhu1/SeniorDesignRISCV/src/fetch.v
-/home/ecelrc/students/wzhu1/SeniorDesignRISCV/src/instruction_cache.v
-/home/ecelrc/students/wzhu1/SeniorDesignRISCV/src/register_file.v
+/home/ecelrc/students/wzhu1/SeniorDesignRISCV/src/memoryFile.v

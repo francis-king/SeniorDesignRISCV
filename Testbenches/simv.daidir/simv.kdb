@@ -9,7 +9,7 @@ UUM=FALSE
 KDB=FALSE
 USE_NOVAS_HOME=FALSE
 COSIM=FALSE
-TOP=top 
+TOP=memoryFile 
 OPTION=-ssz -ssv -ssy 
 ELAB_OPTION=-ssz -ssv -ssy 
 

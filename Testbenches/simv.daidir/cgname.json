@@ -1,21 +1,9 @@
 {
-    "decode": [
-        "decode",
-        "dVBRC",
+    "memoryFile": [
+        "memoryFile",
+        "hUy1e",
         "module",
-        3
-    ],
-    "execute": [
-        "execute",
-        "sEyU5",
-        "module",
-        4
-    ],
-    "fetch": [
-        "fetch",
-        "Qk6Wn",
-        "module",
-        1
+        5
     ],
     "...MASTER...": [
         "SIM",
