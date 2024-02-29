@@ -33,7 +33,6 @@ module writeback(
     input        WB_V,
     input [63:0] WB_CSRFD,
     input [63:0] WB_RFD,
-    input [4:0]  WB_DRID,
     input        WB_ECALL,
     input        FE_IAM,
     input        FE_IAF,
@@ -87,34 +86,34 @@ always @(posedge CLK)begin
         WB_CAUSE <= wb_cause;
         WB_CS <= wb_cs;
         if(WB_IR[6:0] == 7'b0000011)begin
-            WB_RF_DATA = WB_MEM_RESULT;
-            WB_ST_REG = 1;
-            WB_ST_CSR = 0;
+            WB_RF_DATA <= WB_MEM_RESULT;
+            WB_ST_REG <= 1;
+            WB_ST_CSR <= 0;
         end
         else if(WB_IR[6:0] == 7'b0010011 || WB_IR[6:0] == 7'b0110011)begin
-            WB_RF_DATA = WB_ALU_RESULT;
-            WB_ST_REG = 1;
-            WB_ST_CSR = 0;
+            WB_RF_DATA <= WB_ALU_RESULT;
+            WB_ST_REG <= 1;
+            WB_ST_CSR <= 0;
         end
         else if(WB_IR[6:0] == 1110011)begin
-            WB_RF_DATA = WB_RFD;
-            WB_CSR_DATA = WB_CSRFD;
-            WB_ST_REG = 1;
-            WB_ST_CSR = 1;
+            WB_RF_DATA <= WB_RFD;
+            WB_CSR_DATA <= WB_CSRFD;
+            WB_ST_REG <= 1;
+            WB_ST_CSR <= 1;
         end
         else if(WB_IR[6:0] == 1100111 || WB_IR[6:0] == 1101111)begin
-            WB_RF_DATA = WB_NPC;
-            WB_ST_REG = 1;
-            WB_ST_CSR = 0;
+            WB_RF_DATA <= WB_NPC;
+            WB_ST_REG <= 1;
+            WB_ST_CSR <= 0;
         end
         else begin
 
         end
         
         WB_BR_JMP_TARGET = WB_ALU_RESULT;
-        WB_PC_MUX_OUT = WB_PC_MUX;
-        WB_IR_OUT = WB_IR;
-        WB_DRID_OUT = WB_DRID;
+        WB_PC_MUX_OUT <= WB_PC_MUX;
+        WB_IR_OUT <= WB_IR;
+        WB_DRID_OUT <= WB_IR[11:7];
     end
 
 end

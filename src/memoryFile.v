@@ -8,7 +8,7 @@ module memoryFile (
     input [1:0] size,
     input [63:0] mem_data,
     input [63:0] address,
-    output v_mem_stall,
+    output reg v_mem_stall,
     output [63:0] data_out
 );
 // reg [63:12] cacheAddress;
@@ -18,9 +18,9 @@ reg [7:0] memory [`memSize:0];
 `define numInstructions 8*1
 
 integer i;
-assign v_mem_stall = 1'b0;
 always @(posedge CLK) begin
     if (reset) begin
+        v_mem_stall <= 1'b0;
         memory[0] <= 8'h01;
         memory[1] <= 8'h02;
         memory[2] <= 8'h03;
