@@ -8,16 +8,10 @@ module instruction_cache (
     output wire [31:0] instruction
 );
 // reg [63:12] cacheAddress;
-`define memSize 15
-`define fileName "TestInstructionMemLoad.mem"
 //Page Size of 2^4 byte sized elements
+`define memSize 15
 reg [7:0] memory [`memSize:0];
 `define numInstructions 4*1
-// if (PC[63:12] == cacheAddress){
-//     icache_r = 1;
-// } else{
-//     icache_r = 0;
-// }
 integer i;
 
 always @(posedge CLK) begin
@@ -30,7 +24,6 @@ always @(posedge CLK) begin
         for(i = `numInstructions; i < `memSize + 1; i = i + 1) begin
             memory[i] = 'd0;
         end
-        // $readmemh(`fileName, memory, 0, `numInstructions - 1);
     end
 end
 // assign icache_r = (PC[63:12] == cacheAddress) ? 'd1 : 'd0;
