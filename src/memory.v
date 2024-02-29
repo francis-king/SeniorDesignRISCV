@@ -47,21 +47,23 @@ module memory(
     output reg        WB_PC_MUX,
     output reg        WB_V,
     output reg [63:0] WB_RFD,
-    output reg [63:0] WB_DRID,
     output reg        WB_ECALL,
     output reg [31:0] MEM_IR_OLD,
     output reg        MEM_LAM,
     output reg        MEM_LAF,
     output reg        MEM_SAM,
     output reg        MEM_SAF,
-    output reg        V_MEM_STALL
+    output V_MEM_STALL
 );
 
 wire [63:0] data_out, data;
 wire [1:0] size;
-assign we = (MEM_IR[6:0] == 6'b0100011);
+
+assign we = (MEM_IR[6:0] == 7'b0100011);
+assign lam_in = (!we && (MEM_ALU_RESULT & 64'd7)) == 0 ? 1'b0 : 1'b1;
+assign sam_in = (we && (MEM_ALU_RESULT & 64'd7)) == 0 ? 1'b0 : 1'b1;
 assign size = (MEM_IR[14:12] == 3'b000) ? 2'b00 : (MEM_IR[14:12] == 3'b001) ? 2'b01 : (MEM_IR[14:12] == 3'b010) ? 2'b10 : 2'b11;
-memoryFile m0 (.MEM_V(MEM_V), .CLK(CLK), .reset(RESET), .we(we), .size(size), .mem_data(mem_data), .address(WB_ALU_RESULT), .v_mem_stall(V_MEM_STALL), .data_out(data));
+memoryFile m0 (.MEM_V(MEM_V), .CLK(CLK), .reset(RESET), .we(we), .size(size), .mem_data(MEM_SR2), .address(MEM_ALU_RESULT), .v_mem_stall(V_MEM_STALL), .data_out(data));
 
 
 assign data_out = (MEM_IR[14:12] == 3'b000) ? (data&(64'h0FF)) : (MEM_IR[14:12] == 3'b001) ? (data&(64'h0FFFF)) : (MEM_IR[14:12] == 3'b010) ? (data&(64'h0FFFFFFFF)) : (MEM_IR[14:12] == 3'b011) ? data : (MEM_IR[14:12] == 3'b100) ? ((data&(64'h0FF))<<8) : (MEM_IR[14:12] == 3'b101) ? ((data&(64'h0FFFF))<<16) : ((data&(64'h0FFFFFFFF))<<32);
@@ -69,16 +71,22 @@ assign data_out = (MEM_IR[14:12] == 3'b000) ? (data&(64'h0FF)) : (MEM_IR[14:12] 
 always @(posedge CLK) begin
     if(RESET) begin 
         WB_V <= 1'b0;
+        MEM_LAF <= 1'b0;
+        MEM_SAF <= 1'b0;
     end
     else begin
         if (!WB_STALL) begin
+            MEM_LAM <= lam_in;
+            MEM_SAM <= sam_in;
             WB_NPC <= MEM_NPC;
+            MEM_IR_OLD <= MEM_IR;
             WB_ALU_RESULT <= MEM_ALU_RESULT;
             WB_MEM_RESULT <= data_out;
             WB_IR <= MEM_IR;
             WB_CSRFD <= MEM_CSRFD;
             WB_RFD <= MEM_RFD;
             WB_V <= MEM_V;
+            WB_ECALL <= MEM_ECALL;
             if(MEM_IR[7:0] == 7'b1101111 || MEM_IR[7:0] == 7'b1100111)begin
                 WB_PC_MUX <= 1;
             end
