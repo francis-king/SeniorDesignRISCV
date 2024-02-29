@@ -28,7 +28,7 @@ module top(
 );
 //stall signals
 wire v_de_br_stall;
-wire mem_stall;
+wire v_mem_stall;
 wire wb_stall;
 
 
@@ -43,7 +43,7 @@ wire        de_cs;
 wire [63:0] de_npc;
 wire [31:0] de_ir;
 wire        de_v;
-
+wire [1:0] privilige;
 
 //wires from EXECUTE stage
 wire [63:0] exe_ir_old;
@@ -61,7 +61,7 @@ wire        exe_ecall;
 wire [63:0] mem_ir_old;
 wire [4:0]  mem_drid;
 wire [63:0] mem_alu_result;
-wire [63:0] mem_pc;
+wire [63:0] mem_npc;
 wire [31:0] mem_ir;
 wire [63:0] mem_sr2;
 wire [63:0] mem_sr1;
@@ -101,7 +101,7 @@ wire [63:0] wb_rf_data;
 
 
 fetch fetch_stage(
-    .mem_stall(mem_stall),
+    .v_mem_stall(v_mem_stall),
     .WB_PC_MUX(wb_pc_mux_out),
     .WB_BR_JMP_PC(wb_br_jmp_pc),
     .DE_MTVEC(de_mtvec),
@@ -133,15 +133,13 @@ decode decode_stage(
     .WB_CAUSE(wb_cause),
     .EXE_IR_OLD(exe_ir_old),
     .MEM_IR_OLD(mem_ir_old),
-    .EXE_DRID(exe_drid),
-    .MEM_DRID(mem_drid),
     .WB_ST_REG(wb_st_reg),
     .WB_ST_CSR(wb_st_csr),
-    .MEM_STALL(mem_stall),
+    .V_MEM_STALL(v_mem_stall),
     .CLK(CLK),
-    .reset(RESET),
+    .RESET(RESET),
     .EXE_NPC(exe_npc),
-    .EXE_CSFRD(exe_csrfd),
+    .EXE_CSRFD(exe_csrfd),
     .EXE_ALU_ONE(exe_alu_one),
     .EXE_ALU_TWO(exe_alu_two),
     .EXE_IR(exe_ir),
@@ -149,12 +147,14 @@ decode decode_stage(
     .EXE_ECALL(exe_ecall),
     .EXE_RFD(exe_rfd),
     .v_de_br_stall(v_de_br_stall),
-    .DE_MTVEC(de_mtvec)
+    .DE_MTVEC(de_mtvec),
+    .privilige(privilige),
+    .DE_CS(de_cs)
 );
 
 execute execute_stage(
     .clk(CLK),
-    .reset(RESET),
+    .RESET(RESET),
     .EXE_NPC(exe_npc),
     .EXE_CSRFD(exe_csrfd),
     .EXE_ALU1(exe_alu_one),
@@ -163,7 +163,6 @@ execute execute_stage(
     .EXE_V(exe_v),
     .EXE_ECALL(exe_ecall),
     .EXE_RFD(exe_rfd),
-    .MEM_PC(mem_pc),
     .MEM_ALU_RESULT(mem_alu_result),
     .MEM_IR(mem_ir),
     .MEM_SR2(mem_sr2),
@@ -171,8 +170,9 @@ execute execute_stage(
     .MEM_V(mem_v),
     .MEM_CSRFD(mem_csrfd),
     .MEM_RFD(mem_rfd),
-    .MEM_stall(mem_stall),
-    .MEM_ECALL(mem_ecall)
+    .V_MEM_STALL(v_mem_stall),
+    .MEM_ECALL(mem_ecall),
+    .MEM_NPC(mem_npc)
 );
 
 memory memory_stage(
@@ -180,7 +180,7 @@ memory memory_stage(
     .RESET(RESET),
     .WB_STALL(wb_stall),
     .MEM_NPC(mem_npc),
-    .MEM_STALL(mem_stall),
+    .V_MEM_STALL(v_mem_stall),
     .MEM_CSRFD(mem_csrfd),
     .MEM_ALU_RESULT(mem_alu_result),
     .MEM_SR1(mem_sr1),
@@ -208,6 +208,9 @@ memory memory_stage(
 );
 
 writeback writeback_stage(
+    .CLK(CLK),
+    .RESET(RESET),
+    .PRIVILEGE(privilige),
     .WB_NPC(wb_npc),
     .WB_MEM_RESULT(wb_mem_result),
     .WB_ALU_RESULT(wb_alu_result),

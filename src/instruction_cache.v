@@ -10,7 +10,7 @@ module instruction_cache (
 // reg [63:12] cacheAddress;
 `define memSize 15
 `define fileName "TestInstructionMemLoad.mem"
-//Page Size of 2^12 byte sized elements
+//Page Size of 2^4 byte sized elements
 reg [7:0] memory [`memSize:0];
 `define numInstructions 4*1
 // if (PC[63:12] == cacheAddress){
@@ -35,7 +35,7 @@ always @(posedge CLK) begin
 end
 // assign icache_r = (PC[63:12] == cacheAddress) ? 'd1 : 'd0;
 assign icache_r = 1'b1;
-assign instruction = {memory[{PC[11:2],2'b11}], memory[{PC[11:2],2'b10}], memory[{PC[11:2],2'b01}], memory[{PC[11:2],2'b00}]};
+assign instruction = {memory[{PC[3:2],2'b11}], memory[{PC[3:2],2'b10}], memory[{PC[3:2],2'b01}], memory[{PC[3:2],2'b00}]};
 
 //add in code to talk to memory bus
 

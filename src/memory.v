@@ -54,43 +54,41 @@ module memory(
     output reg        MEM_LAF,
     output reg        MEM_SAM,
     output reg        MEM_SAF,
-    output reg        MEM_STALL
+    output reg        V_MEM_STALL
 );
 
-
-always @(*) begin
-    if(MEM_IR[7:0] == 7'b1101111 || MEM_IR[7:0] == 7'b1100111)begin
-        WB_PC_MUX = 1;
-    end
-    else if(MEM_IR[7:0] == 7'b1100011)begin
-        case(MEM_IR[14:12])
-            3'b000: begin
-                WB_PC_MUX = (MEM_SR1 == MEM_SR2);         // beq
-            end
-            3'b001: WB_PC_MUX = (MEM_SR1 != MEM_SR2);         // bne
-            3'b100: WB_PC_MUX = (MEM_SR1 < MEM_SR2);          // blt
-            3'b101: WB_PC_MUX = (MEM_SR1 >= MEM_SR2);         // bge
-            3'b110: WB_PC_MUX = (MEM_SR1 < MEM_SR2);          // bltu
-            3'b111: WB_PC_MUX = (MEM_SR1 >= MEM_SR2);         // bgeu
-        endcase
-    end
-    else begin
-        WB_PC_MUX = 0;
-    end
-end
-
+assign V_MEM_STALL = 1'b1 && MEM_V;
 always @(posedge CLK) begin
     if(RESET) begin 
-        MEM_STALL <= 1'b0;
+        WB_V <= 1'b0;
     end
     else begin
         if (!WB_STALL) begin
             WB_NPC <= MEM_NPC;
-            WB_ALU_RESULT <= WB_ALU_RESULT;
+            WB_ALU_RESULT <= MEM_ALU_RESULT;
+            WB_MEM_RESULT <= MEM_ALU_RESULT;
             WB_IR <= MEM_IR;
             WB_CSRFD <= MEM_CSRFD;
             WB_RFD <= MEM_RFD;
             WB_V <= MEM_V;
+            if(MEM_IR[7:0] == 7'b1101111 || MEM_IR[7:0] == 7'b1100111)begin
+                WB_PC_MUX <= 1;
+            end
+            else if(MEM_IR[7:0] == 7'b1100011)begin
+                case(MEM_IR[14:12])
+                    3'b000: begin
+                        WB_PC_MUX <= (MEM_SR1 == MEM_SR2);         // beq
+                    end
+                    3'b001: WB_PC_MUX <= (MEM_SR1 != MEM_SR2);         // bne
+                    3'b100: WB_PC_MUX <= (MEM_SR1 < MEM_SR2);          // blt
+                    3'b101: WB_PC_MUX <= (MEM_SR1 >= MEM_SR2);         // bge
+                    3'b110: WB_PC_MUX <= (MEM_SR1 < MEM_SR2);          // bltu
+                    3'b111: WB_PC_MUX <= (MEM_SR1 >= MEM_SR2);         // bgeu
+                endcase
+            end
+            else begin
+                WB_PC_MUX <= 0;
+            end
         end        
     end
 end

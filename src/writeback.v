@@ -44,7 +44,7 @@ module writeback(
     input        MEM_SAF,
     input        TIMER,
     input        EXTERNAL,
-    input        PRIVILEGE, //from decode
+    input [1:0] PRIVILEGE, //from decode
 
     output reg [63:0] WB_RF_DATA,
     output reg [63:0] WB_CSR_DATA,
@@ -60,14 +60,15 @@ module writeback(
     
 );
 
-wire wb_cause, wb_cs;
+wire wb_cs;
+wire [63:0] wb_cause;
 
 trap_handler Thandler(
     .CLK(CLK),
     .ECALL(WB_ECALL),
-    .F_IAM(F_IAM),
-    .F_IAF(F_IAF),
-    .F_II(F_II),
+    .F_IAM(FE_IAM),
+    .F_IAF(FE_IAF),
+    .F_II(FE_II),
     .MEM_LAM(MEM_LAM),
     .MEM_LAF(MEM_LAF),
     .MEM_SAM(MEM_SAM),

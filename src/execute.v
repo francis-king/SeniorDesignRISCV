@@ -21,7 +21,7 @@
 
 module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
                EXE_V, EXE_RFD, MEM_NPC, MEM_ALU_RESULT, MEM_IR,
-               MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, MEM_STALL, MEM_ECALL, EXE_ECALL, RESET
+               MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, V_MEM_STALL, MEM_ECALL, EXE_ECALL, RESET
                 );
 
 //`define func3 EXE_IR[14:12];
@@ -32,9 +32,8 @@ module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
 `define func3 EXE_IR[14:12]
 `define func7 EXE_IR[31:25]
 input clk;
-input reset;
 input EXE_V;
-input MEM_STALL;
+input V_MEM_STALL;
 input RESET;
 input EXE_ECALL;
 input [31:0] EXE_IR;
@@ -45,7 +44,7 @@ output reg[31:0] MEM_IR;
 output reg [63:0] MEM_NPC, MEM_ALU_RESULT, MEM_SR2, MEM_SR1,
               MEM_CSRFD, MEM_RFD;
 output reg MEM_V;
-
+wire [63:0] csrresult;
 wire [31:0] IR;
 wire [63:0] alu_A, alu_B, EXE_PC, alu_out, temp, temp_div;
 wire [63:0] tempsum, tempshiftright, tempshiftleft, tempsubab, tempblah;
@@ -77,10 +76,9 @@ always @(posedge clk) begin
         MEM_RFD <= 0;
         MEM_V <= 0;
         MEM_ALU_RESULT <= 0;
-        
     end
     else begin
-    if (!MEM_STALL) begin
+    if (!V_MEM_STALL) begin
         MEM_NPC <= EXE_NPC;
         MEM_ECALL <= EXE_ECALL;
         MEM_IR <= EXE_IR;
@@ -260,14 +258,15 @@ always @(posedge clk) begin
     end
 end
 end
-reg [63:0] csrresult = 0;
-always @(*) begin
-    case(EXE_IR[13:12]) 
-        2'b01:csrresult = EXE_RFD; //write
-        2'b10:csrresult = EXE_ALU1 | EXE_RFD; //or
-        2'b11:csrresult = EXE_ALU1 & EXE_RFD; //and
-        default: ;
-    endcase
-end
+
+assign csrresult = (EXE_IR[13:12] == 2'b01) ? EXE_RFD : (EXE_IR[13:12] == 2'b10) ? (EXE_ALU1 | EXE_RFD) : (EXE_IR[13:12] == 2'b10) ? (EXE_ALU1 & EXE_RFD) : 'd0;
+// always @(*) begin
+//     case(EXE_IR[13:12]) 
+//         2'b01:csrresult = EXE_RFD; //write
+//         2'b10:csrresult = EXE_ALU1 | EXE_RFD; //or
+//         2'b11:csrresult = EXE_ALU1 & EXE_RFD; //and
+//         default: ;
+//     endcase
+// end
 
 endmodule

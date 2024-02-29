@@ -8,4 +8,4 @@
 /home/ecelrc/students/wzhu1/SeniorDesignRISCV/src/trap_handler.v
 /home/ecelrc/students/wzhu1/SeniorDesignRISCV/src/writeback.v
 /home/ecelrc/students/wzhu1/SeniorDesignRISCV/src/fetch.v
-/home/ecelrc/students/wzhu1/SeniorDesignRISCV/Testbenches/tb_top_add.v
+# /home/ecelrc/students/wzhu1/SeniorDesignRISCV/Testbenches/tb_top.v
