@@ -83,7 +83,7 @@ wire [63:0] wb_mem_result;
 wire        wb_cs;
 wire [63:0] wb_cause;
 wire wb_st_reg;
-wire [63:0] wb_st_csr;
+wire wb_st_csr;
 wire        wb_pc_mux_out;
 wire        wb_pc_mux;
 wire [63:0] wb_br_jmp_target;
@@ -237,11 +237,5 @@ writeback writeback_stage(
     .WB_CAUSE(wb_cause),
     .WB_CS(wb_cs)
 );
-
-
-
-
-
-
 
 endmodule

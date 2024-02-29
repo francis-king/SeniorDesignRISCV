@@ -9,9 +9,9 @@ module instruction_cache (
 );
 // reg [63:12] cacheAddress;
 //Page Size of 2^4 byte sized elements
-`define memSize 15
-reg [7:0] memory [`memSize:0];
-`define numInstructions 4*1
+`define fe_memSize 15
+reg [7:0] memory [`fe_memSize:0];
+`define fe_numInstructions 4*1
 integer i;
 
 always @(posedge CLK) begin
@@ -21,7 +21,7 @@ always @(posedge CLK) begin
         memory[2] <= 8'h50;
         memory[3] <= 8'h00;
 
-        for(i = `numInstructions; i < `memSize + 1; i = i + 1) begin
+        for(i = `fe_numInstructions; i < `fe_memSize + 1; i = i + 1) begin
             memory[i] = 'd0;
         end
     end

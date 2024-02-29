@@ -51,8 +51,8 @@ module writeback(
     output reg [4:0]  WB_DRID_OUT,
     output reg        WB_PC_MUX_OUT,
     output reg [31:0] WB_IR_OUT,
-    output reg  WB_ST_REG,
-    output reg [63:0] WB_ST_CSR,
+    output reg WB_ST_REG,
+    output reg WB_ST_CSR,
     output reg [63:0] WB_CAUSE,
     output reg        WB_CS
 

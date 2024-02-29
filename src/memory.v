@@ -34,7 +34,6 @@ module memory(
     input [63:0] MEM_SR2,
     input        MEM_V,
     input [63:0] MEM_RFD,
-    input [63:0] MEM_DRID,
     input        MEM_ECALL,
     input [31:0] MEM_IR,
 
