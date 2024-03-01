@@ -31,7 +31,7 @@ module decode (
     output            v_de_br_stall,
     output     [63:0] DE_MTVEC,
     output DE_CS,
-    output [1:0] privilige
+    output [1:0] privilege
 );
 `define de_func3 DE_IR[14:12]
 `define de_opcode DE_IR[6:0]
@@ -64,7 +64,7 @@ csr_file csr(
     .PC_OUT(DE_MTVEC),
     .CLK(CLK),
     .DE_CS(DE_CS),
-    .privilige(privilige)
+    .PRIVILEGE(privilege)
     );
 
 //DE_ALU1_MUX

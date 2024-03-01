@@ -117,7 +117,7 @@ always @(posedge CLK) begin
                 WB_ST_REG <= 1;
                 WB_ST_CSR <= 0;
             end
-            else begin 
+            else begin //otherwise, do not load into CSR/Reg
                 WB_ST_REG <= 0;
                 WB_ST_CSR <= 0;
             end

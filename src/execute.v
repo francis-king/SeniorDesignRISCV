@@ -22,7 +22,7 @@
 module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
                EXE_V, EXE_RFD, MEM_NPC, MEM_ALU_RESULT, MEM_IR,
                MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, V_MEM_STALL, MEM_ECALL, EXE_ECALL, RESET,
-               V_AGEX_BR_STALL );
+               V_AGEX_BR_STALL, EXE_IR_OLD );
 
 //`define func3 EXE_IR[14:12];
 //`define EXE_IR[30] EXE_EXE_IR[30];
@@ -40,7 +40,7 @@ input [31:0] EXE_IR;
 input [63:0] EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2;
 input [63:0] EXE_RFD;
 output reg MEM_ECALL;
-output reg[31:0] MEM_IR;
+output reg[31:0] MEM_IR, EXE_IR_OLD;
 output reg [63:0] MEM_NPC, MEM_ALU_RESULT, MEM_SR2, MEM_SR1,
               MEM_CSRFD, MEM_RFD;
 output reg MEM_V, V_AGEX_BR_STALL;
@@ -69,9 +69,11 @@ assign alu_B = EXE_ALU2;
 always @(posedge clk) begin
     if(RESET) begin 
         V_AGEX_BR_STALL <= 1'b0;
+        EXE_IR_OLD <= 0;
     end
     else begin 
         V_AGEX_BR_STALL <= V_AGEX_BR_STALL;  //Placeholder for agex_br_stall logic.
+        EXE_IR_OLD <= EXE_IR;
     end
 end
 

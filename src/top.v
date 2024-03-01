@@ -45,7 +45,7 @@ wire        de_cs;
 wire [63:0] de_npc;
 wire [31:0] de_ir;
 wire        de_v;
-wire [1:0] privilige;
+wire [1:0] privilege;
 
 //wires from EXECUTE stage
 wire [31:0] exe_ir_old;
@@ -149,7 +149,7 @@ decode decode_stage(
     .EXE_RFD(exe_rfd),
     .v_de_br_stall(v_de_br_stall),
     .DE_MTVEC(de_mtvec),
-    .privilige(privilige),
+    .PRIVILEGE(privilege),
     .DE_CS(de_cs)
 );
 
@@ -164,6 +164,7 @@ execute execute_stage(
     .EXE_V(exe_v),
     .EXE_ECALL(exe_ecall),
     .EXE_RFD(exe_rfd),
+    .EXE_IR_OLD(exe_ir_old),
     .V_AGEX_BR_STALL(v_agex_br_stall),
     .MEM_ALU_RESULT(mem_alu_result),
     .MEM_IR(mem_ir),
@@ -211,7 +212,7 @@ memory memory_stage(
 writeback writeback_stage(
     .CLK(CLK),
     .RESET(RESET),
-    .PRIVILEGE(privilige),
+    .PRIVILEGE(privilege),
     .WB_NPC(wb_npc),
     .WB_MEM_RESULT(wb_mem_result),
     .WB_ALU_RESULT(wb_alu_result),

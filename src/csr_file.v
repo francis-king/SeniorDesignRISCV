@@ -37,12 +37,12 @@ module csr_file(
     output reg DE_CS,
     input CLK,
     input RESET,
-    output [1:0] privilige
+    output reg [1:0] PRIVILEGE
 );
 
 
 reg [63:0] regFile [4095:0];
-reg [1:0] PRIVILEGE;            //holds the privilige mode for the current thread
+            //holds the privilege mode for the current thread
 wire [1:0] RETURN_PRIVILEGE;
 wire [31:0] RET;
 
@@ -71,13 +71,18 @@ always @(posedge CLK) begin
 
 end
 
-
+integer i;
 always @(posedge CLK)begin
     if(RESET)begin
         PRIVILEGE <= 0;
         PC_OUT <= 0;
         DE_CS <= 0;
         //TODO: reset misa and mhartid registers
+
+        for(i = 0; i < 4096; i= i+1)  //synchronous reset FF for CSR file
+        begin
+            regFile[i] <= 64'd0;
+        end 
     end
     else if(ST_REG)begin
         regFile[DR] <= DATA;

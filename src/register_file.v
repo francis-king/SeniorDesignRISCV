@@ -17,9 +17,9 @@ reg [63:0] regFile [31:0];
 integer i;
 always @(posedge CLK) begin
     if (reset) begin
-        for(i = 0; i < 64; i= i+1)
+        for(i = 0; i < 32; i= i+1)
         begin
-            regFile[i] <= 32'd0;
+            regFile[i] <= 64'd0;
         end 
     end else if (ST_REG) begin
         regFile[DR] <= WB_DATA;

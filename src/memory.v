@@ -83,6 +83,9 @@ always @(posedge CLK) begin
         MEM_LAF <= 1'b0;
         MEM_SAF <= 1'b0;
         WB_PC_MUX <= 1'b0;
+        MEM_IR_OLD <= 0;
+        WB_ALU_RESULT <= 0;
+        WB_MEM_RESULT <= 0;
     end
     else begin
         if (!WB_STALL) begin
