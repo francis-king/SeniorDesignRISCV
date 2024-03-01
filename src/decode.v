@@ -1,12 +1,8 @@
 `timescale 1ns / 1ps
 
-<<<<<<< Updated upstream
-module decode (
-=======
 module decode (   
     input        CLK,
     input        RESET,
->>>>>>> Stashed changes
     input [63:0] DE_NPC,
     input [31:0] DE_IR,
     input DE_V,
