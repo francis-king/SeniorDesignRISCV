@@ -28,12 +28,11 @@ module writeback(
     input [63:0] WB_NPC,
     input [63:0] WB_MEM_RESULT,
     input [63:0] WB_ALU_RESULT,
-    input [31:0] WB_IR,
+    input [31:0] WB_IR_IN,
     input        WB_PC_MUX,
     input        WB_V,
     input [63:0] WB_CSRFD,
     input [63:0] WB_RFD,
-    input [4:0]  WB_DRID,
     input        WB_ECALL,
     input        FE_IAM,
     input        FE_IAF,
@@ -44,30 +43,31 @@ module writeback(
     input        MEM_SAF,
     input        TIMER,
     input        EXTERNAL,
-    input        PRIVILEGE, //from decode
+    input [1:0] PRIVILEGE, //from decode
 
     output reg [63:0] WB_RF_DATA,
     output reg [63:0] WB_CSR_DATA,
     output reg [63:0] WB_BR_JMP_TARGET,
-    output reg [4:0]  WB_DRID_OUT,
     output reg        WB_PC_MUX_OUT,
-    output reg [63:0] WB_IR_OUT,
-    output reg        WB_ST_REG,
-    output reg        WB_ST_CSR,
+    output reg [31:0] WB_IR_OUT,
+    output reg WB_ST_REG,
+    output reg WB_ST_CSR,
     output reg [63:0] WB_CAUSE,
-    output reg        WB_CS
+    output reg        WB_CS,
+    output reg WB_STALL
 
     
 );
 
-wire wb_cause, wb_cs;
+wire wb_cs;
+wire [63:0] wb_cause;
 
 trap_handler Thandler(
     .CLK(CLK),
     .ECALL(WB_ECALL),
-    .F_IAM(F_IAM),
-    .F_IAF(F_IAF),
-    .F_II(F_II),
+    .F_IAM(FE_IAM),
+    .F_IAF(FE_IAF),
+    .F_II(FE_II),
     .MEM_LAM(MEM_LAM),
     .MEM_LAF(MEM_LAF),
     .MEM_SAM(MEM_SAM),
@@ -80,49 +80,61 @@ trap_handler Thandler(
 );
 
 
-//mux for selecting data to be written to register file
-always @(posedge CLK)begin
-    if(WB_V)begin
-        WB_CAUSE <= wb_cause;
-        WB_CS <= wb_cs;
-        if(WB_IR[6:0] == 7'b0000011)begin
-            WB_RF_DATA = WB_MEM_RESULT;
-            WB_ST_REG = 1;
-            WB_ST_CSR = 0;
-        end
-        else if(WB_IR[6:0] == 7'b0010011 || WB_IR[6:0] == 7'b0110011)begin
-            WB_RF_DATA = WB_ALU_RESULT;
-            WB_ST_REG = 1;
-            WB_ST_CSR = 0;
-        end
-        else if(WB_IR[6:0] == 1110011)begin
-            WB_RF_DATA = WB_RFD;
-            WB_CSR_DATA = WB_CSRFD;
-            WB_ST_REG = 1;
-            WB_ST_CSR = 1;
-        end
-        else if(WB_IR[6:0] == 1100111 || WB_IR[6:0] == 1101111)begin
-            WB_RF_DATA = WB_NPC;
-            WB_ST_REG = 1;
-            WB_ST_CSR = 0;
-        end
-        else begin
-
-        end
-        
-        WB_BR_JMP_TARGET = WB_ALU_RESULT;
-        WB_PC_MUX_OUT = WB_PC_MUX;
-        WB_IR_OUT = WB_IR;
-        WB_DRID_OUT = WB_DRID;
+//with reset
+always @(posedge CLK) begin 
+    if(RESET)begin
+        WB_RF_DATA <= 0;
+        WB_CSR_DATA <= 0;
+        WB_BR_JMP_TARGET <= 0;
+        WB_PC_MUX_OUT <= 0;
+        WB_IR_OUT <= 0;
+        WB_ST_REG <= 0;
+        WB_ST_CSR <= 0;
+        WB_CAUSE <= 0;
+        WB_CS <= 0;
+        WB_STALL <= 0; //Todo: implement missing WB_STALL logic
     end
+    else begin
+        if(WB_V) begin 
+            WB_CAUSE <= wb_cause;
+            WB_CS <= wb_cs;
+            if(WB_IR_IN[6:0] == 7'b0000011)begin //Writeback result of load instruction (from memory) to register
+                WB_RF_DATA <= WB_MEM_RESULT;
+                WB_ST_REG <= 1;
+                WB_ST_CSR <= 0;
+            end
+            else if(WB_IR_IN[6:0] == 7'b0010011 || WB_IR_IN[6:0] == 7'b0110011)begin  //Writeback ALU result to register
+                WB_RF_DATA <= WB_ALU_RESULT;
+                WB_ST_REG <= 1;
+                WB_ST_CSR <= 0;
+            end
+            else if(WB_IR_IN[6:0] == 1110011)begin  //Writeback CSR instruction
+                WB_RF_DATA <= WB_RFD;
+                WB_CSR_DATA <= WB_CSRFD;
+                WB_ST_REG <= 1;
+                WB_ST_CSR <= 1;
+            end
+            else if(WB_IR_IN[6:0] == 1100111 || WB_IR_IN[6:0] == 1101111)begin //Writeback NPC to general-purpose register
+                WB_RF_DATA <= WB_NPC;
+                WB_ST_REG <= 1;
+                WB_ST_CSR <= 0;
+            end
+            else begin //otherwise, do not load into CSR/Reg
+                WB_ST_REG <= 0;
+                WB_ST_CSR <= 0;
+            end
+            
+            WB_BR_JMP_TARGET <= WB_ALU_RESULT;
+            WB_PC_MUX_OUT <= WB_PC_MUX;
+            WB_IR_OUT <= WB_IR_IN;
+        end 
+        else begin 
+            WB_ST_REG <= 1'b0;
+            WB_ST_CSR <= 1'b0;
+        end
 
+    end
 end
-
-
-
-
-
-
 
 
 endmodule

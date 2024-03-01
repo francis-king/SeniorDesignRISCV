@@ -27,21 +27,22 @@ module csr_file(
     input [11:0] DR,
     input [11:0] SR,
     input [63:0] DATA,
-    input [63:0] IR,
+    input [31:0] IR,
     input ST_REG,
     input CS,
     input [63:0] CAUSE,
     input [63:0] NPC,
-    output     [63:0] OUT,
+    output [63:0] OUT,
     output reg [63:0] PC_OUT,
     output reg DE_CS,
     input CLK,
-    input RESET
+    input RESET,
+    output reg [1:0] PRIVILEGE
 );
 
 
 reg [63:0] regFile [4095:0];
-reg [1:0] PRIVILEGE;            //holds the privilige mode for the current thread
+            //holds the privilege mode for the current thread
 wire [1:0] RETURN_PRIVILEGE;
 wire [31:0] RET;
 
@@ -50,7 +51,6 @@ assign RET = {2'b0,RETURN_PRIVILEGE,28'h0200073};
 
 always @(posedge CLK) begin
     if(CS)begin
-
         regFile[{2'b0,2'b11,8'h42}] <= CAUSE;                                        //_Cause register set
         PC_OUT <= regFile[{2'b0,2'b11,8'h05}] + (4*(CAUSE[12:0]));                   //trap address in vector table
         regFile[{2'b0,2'b11,8'h00}][12:11] <= 2'b11;                                         //setting _status.xpp
@@ -59,7 +59,6 @@ always @(posedge CLK) begin
         regFile[{2'b0,2'b11,8'h41}] <= NPC;                                                  //saving PC in _PC
         PRIVILEGE <= 2'b11;
         DE_CS <= 1;                                                                                                 
-
     end
     else if(IR == RET)begin
         regFile[{2'b0,PRIVILEGE,8'h00}][RETURN_PRIVILEGE] <= regFile[{2'b0,PRIVILEGE,8'h00}][PRIVILEGE+4];  //setting _status.yie to _status.xpie
@@ -72,14 +71,18 @@ always @(posedge CLK) begin
 
 end
 
-
+integer i;
 always @(posedge CLK)begin
     if(RESET)begin
         PRIVILEGE <= 0;
-        OUT <= 0;
         PC_OUT <= 0;
         DE_CS <= 0;
         //TODO: reset misa and mhartid registers
+
+        for(i = 0; i < 4096; i= i+1)  //synchronous reset FF for CSR file
+        begin
+            regFile[i] <= 64'd0;
+        end 
     end
     else if(ST_REG)begin
         regFile[DR] <= DATA;
@@ -87,6 +90,6 @@ always @(posedge CLK)begin
 
 end
 
- assign OUT = regFile[SR];
+ assign OUT = (RESET) ? 'd0: regFile[SR];
 
 endmodule
