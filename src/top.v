@@ -30,6 +30,8 @@ module top(
 wire v_de_br_stall;
 wire v_mem_stall;
 wire wb_stall;
+wire v_agex_br_stall;
+wire v_mem_br_stall;
 
 
 //wires from FETCH stage
@@ -74,7 +76,7 @@ wire        mem_sam;
 wire        mem_saf;
 
 //wires from WRITEBACK stage
-wire [31:0] wb_ir;
+wire [31:0] wb_ir_in;
 wire [31:0] wb_ir_out;
 wire [63:0] wb_csrfd;
 wire [63:0] wb_rfd;
@@ -90,7 +92,7 @@ wire [63:0] wb_br_jmp_target;
 wire [63:0] wb_npc;
 wire        wb_v;
 wire [4:0]  wb_drid;
-wire [4:0]  wb_drid_out;
+
 wire        wb_ecall;
 wire [63:0] wb_csr_data;
 wire [63:0] wb_rf_data;
@@ -106,8 +108,8 @@ fetch fetch_stage(
     .DE_MTVEC(de_mtvec),
     .DE_CS(de_cs),
     .v_de_br_stall(v_de_br_stall),      //TODO: figure out stall
-    .v_agex_br_stall(),
-    .v_mem_br_stall(),
+    .v_agex_br_stall(v_agex_br_stall),
+    .v_mem_br_stall(v_mem_br_stall),
     .CLK(CLK),
     .RESET(RESET),
     .DE_NPC(de_npc),
@@ -122,7 +124,7 @@ decode decode_stage(
     .DE_NPC(de_npc),
     .DE_IR(de_ir),
     .DE_V(de_v),
-    .WB_IR(wb_ir),
+    .WB_IR(wb_ir_out),
     .WB_CSRFD(wb_csr_data),
     .WB_RFD(wb_rf_data),
     .MEM_ALU_RESULT(mem_alu_result),
@@ -162,6 +164,7 @@ execute execute_stage(
     .EXE_V(exe_v),
     .EXE_ECALL(exe_ecall),
     .EXE_RFD(exe_rfd),
+    .V_AGEX_BR_STALL(v_agex_br_stall),
     .MEM_ALU_RESULT(mem_alu_result),
     .MEM_IR(mem_ir),
     .MEM_SR2(mem_sr2),
@@ -188,7 +191,7 @@ memory memory_stage(
     .MEM_RFD(mem_rfd),
     .MEM_ECALL(mem_ecall),
     .MEM_IR(mem_ir),
-    .WB_IR(wb_ir),
+    .WB_IR(wb_ir_in),
     .WB_NPC(wb_npc),
     .WB_CSRFD(wb_csrfd),
     .WB_ALU_RESULT(wb_alu_result),
@@ -201,7 +204,8 @@ memory memory_stage(
     .MEM_LAM(mem_lam),            
     .MEM_LAF(mem_laf),
     .MEM_SAM(mem_sam),
-    .MEM_SAF(mem_saf)
+    .MEM_SAF(mem_saf),
+    .V_MEM_BR_STALL(v_mem_br_stall)
 );
 
 writeback writeback_stage(
@@ -211,7 +215,7 @@ writeback writeback_stage(
     .WB_NPC(wb_npc),
     .WB_MEM_RESULT(wb_mem_result),
     .WB_ALU_RESULT(wb_alu_result),
-    .WB_IR(wb_ir),
+    .WB_IR_IN(wb_ir_in),
     .WB_PC_MUX(wb_pc_mux),
     .WB_V(wb_v),
     .WB_CSRFD(wb_csrfd),
@@ -229,7 +233,7 @@ writeback writeback_stage(
     .WB_RF_DATA(wb_rf_data),
     .WB_CSR_DATA(wb_csr_data),
     .WB_BR_JMP_TARGET(wb_br_jmp_target),
-    .WB_DRID_OUT(wb_drid_out),
+    
     .WB_PC_MUX_OUT(wb_pc_mux_out),
     .WB_IR_OUT(wb_ir_out),
     .WB_ST_REG(wb_st_reg),

@@ -26,17 +26,30 @@ wire [31:0] FE_instruction;
 wire FE_LD_PC, FE_LD_DE;
 wire [63:0] FE_PC_input;
 wire icache_r;
+
 always @(posedge CLK) begin
     if (RESET) begin
-        FE_PC <= 'd0; //TODO: change this to inital PC
-        DE_V <= 'd0;
-    end else if (FE_LD_PC) begin
+        FE_PC <= 'd0; //TODO: change this to inital PC  
+    end 
+    else if (FE_LD_PC) begin
         FE_PC <= FE_PC_input;
+        
     end
-    if (FE_LD_DE) begin
-        DE_V <= icache_r && !v_de_br_stall && !v_agex_br_stall && !v_mem_br_stall;
-        DE_IR <= FE_instruction;
+
+    if(RESET) begin
+        DE_NPC <= 'd0;
+        DE_IR <= 'd0;
+    end
+    else begin
         DE_NPC <= FE_PC + 4;
+        DE_IR <= FE_instruction;
+    end
+    
+    if (RESET) begin
+        DE_V <= 'd0;
+    end
+    else if (FE_LD_DE) begin
+        DE_V <= icache_r && !v_de_br_stall && !v_agex_br_stall && !v_mem_br_stall;
     end
 end
 

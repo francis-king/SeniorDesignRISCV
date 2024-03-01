@@ -21,8 +21,8 @@
 
 module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
                EXE_V, EXE_RFD, MEM_NPC, MEM_ALU_RESULT, MEM_IR,
-               MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, V_MEM_STALL, MEM_ECALL, EXE_ECALL, RESET
-                );
+               MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, V_MEM_STALL, MEM_ECALL, EXE_ECALL, RESET,
+               V_AGEX_BR_STALL );
 
 //`define func3 EXE_IR[14:12];
 //`define EXE_IR[30] EXE_EXE_IR[30];
@@ -43,7 +43,8 @@ output reg MEM_ECALL;
 output reg[31:0] MEM_IR;
 output reg [63:0] MEM_NPC, MEM_ALU_RESULT, MEM_SR2, MEM_SR1,
               MEM_CSRFD, MEM_RFD;
-output reg MEM_V;
+output reg MEM_V, V_AGEX_BR_STALL;
+
 wire [63:0] csrresult;
 wire [31:0] IR;
 wire [63:0] alu_A, alu_B, EXE_PC, alu_out, temp, temp_div;
@@ -64,6 +65,15 @@ assign alu_A = ((`opcode == 7'b0000011) || (`opcode == 0010111) ||
                 (`opcode == 7'b0100011) || (`opcode == 7'b1101111) ||
                 (`opcode == 7'b1100111))? EXE_PC : EXE_ALU1;
 assign alu_B = EXE_ALU2;
+
+always @(posedge clk) begin
+    if(RESET) begin 
+        V_AGEX_BR_STALL <= 1'b0;
+    end
+    else begin 
+        V_AGEX_BR_STALL <= V_AGEX_BR_STALL;  //Placeholder for agex_br_stall logic.
+    end
+end
 
 always @(posedge clk) begin
     if(RESET)begin

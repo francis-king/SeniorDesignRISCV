@@ -52,6 +52,7 @@ module memory(
     output reg        MEM_LAF,
     output reg        MEM_SAM,
     output reg        MEM_SAF,
+    output reg        V_MEM_BR_STALL,
     output V_MEM_STALL
 );
 
@@ -69,9 +70,19 @@ assign data_out = (MEM_IR[14:12] == 3'b000) ? (data&(64'h0FF)) : (MEM_IR[14:12] 
 
 always @(posedge CLK) begin
     if(RESET) begin 
+        V_MEM_BR_STALL <= 1'b0;
+    end
+    else begin 
+        V_MEM_BR_STALL <= V_MEM_BR_STALL;  //Placeholder for agex_br_stall logic.
+    end
+end
+
+always @(posedge CLK) begin
+    if(RESET) begin 
         WB_V <= 1'b0;
         MEM_LAF <= 1'b0;
         MEM_SAF <= 1'b0;
+        WB_PC_MUX <= 1'b0;
     end
     else begin
         if (!WB_STALL) begin
