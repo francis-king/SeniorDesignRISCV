@@ -86,6 +86,13 @@ always @(posedge CLK) begin
         MEM_IR_OLD <= 0;
         WB_ALU_RESULT <= 0;
         WB_MEM_RESULT <= 0;
+        WB_NPC <= 0;
+        WB_IR <= 0;
+        WB_CSRFD <= 0;
+        WB_RFD <= 0;
+        WB_ECALL <= 0;
+        MEM_LAM <= 0;
+        MEM_SAM <= 0;
     end
     else begin
         if (!WB_STALL) begin

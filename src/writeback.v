@@ -53,7 +53,8 @@ module writeback(
     output reg WB_ST_REG,
     output reg WB_ST_CSR,
     output reg [63:0] WB_CAUSE,
-    output reg        WB_CS
+    output reg        WB_CS,
+    output reg WB_STALL
 
     
 );
@@ -91,6 +92,7 @@ always @(posedge CLK) begin
         WB_ST_CSR <= 0;
         WB_CAUSE <= 0;
         WB_CS <= 0;
+        WB_STALL <= 0; //Todo: implement missing WB_STALL logic
     end
     else begin
         if(WB_V) begin 

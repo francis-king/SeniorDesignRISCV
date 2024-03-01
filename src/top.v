@@ -96,7 +96,7 @@ wire [4:0]  wb_drid;
 wire        wb_ecall;
 wire [63:0] wb_csr_data;
 wire [63:0] wb_rf_data;
- 
+
 
 //External wires
 
@@ -222,6 +222,7 @@ writeback writeback_stage(
     .WB_CSRFD(wb_csrfd),
     .WB_RFD(wb_rfd),
     .WB_ECALL(wb_ecall),
+    .WB_STALL(wb_stall),
     .FE_IAM(fe_iam),
     .FE_IAF(fe_iaf),
     .FE_II(fe_ii),
