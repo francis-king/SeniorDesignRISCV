@@ -32,6 +32,9 @@ wire v_mem_stall;
 wire wb_stall;
 wire v_agex_br_stall;
 wire v_mem_br_stall;
+wire v_de_trap_stall;
+wire v_agex_trap_stall;
+wire v_mem_trap_stall;
 
 
 //wires from FETCH stage
@@ -110,6 +113,9 @@ fetch fetch_stage(
     .v_de_br_stall(v_de_br_stall),      //TODO: figure out stall
     .v_agex_br_stall(v_agex_br_stall),
     .v_mem_br_stall(v_mem_br_stall),
+    .V_DE_TRAP_STALL(v_de_trap_stall),
+    .V_AGEX_TRAP_STALL(v_agex_trap_stall),
+    .V_MEM_TRAP_STALL(v_mem_trap_stall),
     .CLK(CLK),
     .RESET(RESET),
     .DE_NPC(de_npc),
@@ -148,6 +154,7 @@ decode decode_stage(
     .EXE_ECALL(exe_ecall),
     .EXE_RFD(exe_rfd),
     .v_de_br_stall(v_de_br_stall),
+    .V_DE_TRAP_STALL(v_de_trap_stall),
     .DE_MTVEC(de_mtvec),
     .PRIVILEGE(privilege),
     .DE_CS(de_cs)
@@ -166,6 +173,7 @@ execute execute_stage(
     .EXE_RFD(exe_rfd),
     .EXE_IR_OLD(exe_ir_old),
     .V_AGEX_BR_STALL(v_agex_br_stall),
+    .V_AGEX_TRAP_STALL(v_agex_trap_stall),
     .MEM_ALU_RESULT(mem_alu_result),
     .MEM_IR(mem_ir),
     .MEM_SR2(mem_sr2),
@@ -207,6 +215,7 @@ memory memory_stage(
     .MEM_SAM(mem_sam),
     .MEM_SAF(mem_saf),
     .V_MEM_BR_STALL(v_mem_br_stall)
+    .V_MEM_TRAP_STALL(v_mem_trap_stall)
 );
 
 writeback writeback_stage(

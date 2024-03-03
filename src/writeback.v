@@ -9,9 +9,7 @@
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: This File holds the Control Status Registers for the core and handles
-// the hardware operations that occur when a context switch occurs (interrupt/exception).
-// The CSR file can also be written to and read from using the 6 csr instructions
+// Description: This File handles the writeback of data to the register and csr file.
 //  
 // 
 // Dependencies: 
@@ -80,7 +78,6 @@ trap_handler Thandler(
 );
 
 
-//with reset
 always @(posedge CLK) begin 
     if(RESET)begin
         WB_RF_DATA <= 0;
@@ -108,7 +105,7 @@ always @(posedge CLK) begin
                 WB_ST_REG <= 1;
                 WB_ST_CSR <= 0;
             end
-            else if(WB_IR_IN[6:0] == 1110011)begin  //Writeback CSR instruction
+            else if(WB_IR_IN[6:0] == 1110011)begin  //Writeback for CSR instruction
                 WB_RF_DATA <= WB_RFD;
                 WB_CSR_DATA <= WB_CSRFD;
                 WB_ST_REG <= 1;

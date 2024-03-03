@@ -45,6 +45,7 @@ output reg [63:0] MEM_NPC, MEM_ALU_RESULT, MEM_SR2, MEM_SR1,
               MEM_CSRFD, MEM_RFD;
 output reg MEM_V
 output V_AGEX_BR_STALL;
+output V_AGEX_TRAP_STALL;
 
 wire [63:0] csrresult;
 
@@ -67,6 +68,7 @@ assign alu_A = ((`opcode == 7'b0000011) || (`opcode == 0010111) ||
                 (`opcode == 7'b1100111))? EXE_PC : EXE_ALU1;
 assign alu_B = EXE_ALU2;
 assign V_AGEX_BR_STALL = (de_opcode == 7'b1100011 || de_opcode == 7'b1101111 || de_opcode == 7'b1100111) ? 1'd1 : 1'd0;
+assign V_AGEX_TRAP_STALL = (EXE_IR[27:0] == 28'h0000073) ? 1'd1 : 1'd0;
 
 
 always @(posedge clk) begin
