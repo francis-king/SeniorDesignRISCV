@@ -46,10 +46,13 @@ always @(posedge CLK) begin
     end
     
     if (RESET) begin
-        DE_V <= 'd0;
+        DE_V <= 0;
     end
     else if (FE_LD_DE) begin
         DE_V <= icache_r && !v_de_br_stall && !v_agex_br_stall && !v_mem_br_stall;
+    end
+    else begin
+        DE_V <= 0;
     end
 end
 

@@ -52,8 +52,8 @@ module memory(
     output reg        MEM_LAF,
     output reg        MEM_SAM,
     output reg        MEM_SAF,
-    output reg        V_MEM_BR_STALL,
-    output V_MEM_STALL
+    output            V_MEM_BR_STALL,
+    output            V_MEM_STALL
 );
 
 wire [63:0] data_out, data;
@@ -67,18 +67,11 @@ memoryFile m0 (.MEM_V(MEM_V), .CLK(CLK), .reset(RESET), .we(we), .size(size), .m
 
 
 assign data_out = (MEM_IR[14:12] == 3'b000) ? (data&(64'h0FF)) : (MEM_IR[14:12] == 3'b001) ? (data&(64'h0FFFF)) : (MEM_IR[14:12] == 3'b010) ? (data&(64'h0FFFFFFFF)) : (MEM_IR[14:12] == 3'b011) ? data : (MEM_IR[14:12] == 3'b100) ? ((data&(64'h0FF))<<8) : (MEM_IR[14:12] == 3'b101) ? ((data&(64'h0FFFF))<<16) : ((data&(64'h0FFFFFFFF))<<32);
+assign V_MEM_BR_STALL = (de_opcode == 7'b1100011 || de_opcode == 7'b1101111 || de_opcode == 7'b1100111) ? 1'd1 : 1'd0;
 
 always @(posedge CLK) begin
     if(RESET) begin 
         V_MEM_BR_STALL <= 1'b0;
-    end
-    else begin 
-        V_MEM_BR_STALL <= V_MEM_BR_STALL;  //Placeholder for agex_br_stall logic.
-    end
-end
-
-always @(posedge CLK) begin
-    if(RESET) begin 
         WB_V <= 1'b0;
         MEM_LAF <= 1'b0;
         MEM_SAF <= 1'b0;
@@ -112,14 +105,12 @@ always @(posedge CLK) begin
             end
             else if(MEM_IR[7:0] == 7'b1100011)begin
                 case(MEM_IR[14:12])
-                    3'b000: begin
-                        WB_PC_MUX <= (MEM_SR1 == MEM_SR2);         // beq
-                    end
+                    3'b000: WB_PC_MUX <= (MEM_SR1 == MEM_SR2);         // beq
                     3'b001: WB_PC_MUX <= (MEM_SR1 != MEM_SR2);         // bne
                     3'b100: WB_PC_MUX <= (MEM_SR1 < MEM_SR2);          // blt
                     3'b101: WB_PC_MUX <= (MEM_SR1 >= MEM_SR2);         // bge
                     3'b110: WB_PC_MUX <= (MEM_SR1 < MEM_SR2);          // bltu
-                    3'b111: WB_PC_MUX <= (MEM_SR1 >= MEM_SR2);         // bgeu
+                    3'b111:  WB_PC_MUX <= (MEM_SR1 >= MEM_SR2);         // bgeu
                 endcase
             end
             else begin

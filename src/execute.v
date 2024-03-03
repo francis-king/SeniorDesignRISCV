@@ -43,7 +43,8 @@ output reg MEM_ECALL;
 output reg[31:0] MEM_IR, EXE_IR_OLD;
 output reg [63:0] MEM_NPC, MEM_ALU_RESULT, MEM_SR2, MEM_SR1,
               MEM_CSRFD, MEM_RFD;
-output reg MEM_V, V_AGEX_BR_STALL;
+output reg MEM_V
+output V_AGEX_BR_STALL;
 
 wire [63:0] csrresult;
 
@@ -65,14 +66,14 @@ assign alu_A = ((`opcode == 7'b0000011) || (`opcode == 0010111) ||
                 (`opcode == 7'b0100011) || (`opcode == 7'b1101111) ||
                 (`opcode == 7'b1100111))? EXE_PC : EXE_ALU1;
 assign alu_B = EXE_ALU2;
+assign V_AGEX_BR_STALL = (de_opcode == 7'b1100011 || de_opcode == 7'b1101111 || de_opcode == 7'b1100111) ? 1'd1 : 1'd0;
+
 
 always @(posedge clk) begin
     if(RESET) begin 
-        V_AGEX_BR_STALL <= 1'b0;
         EXE_IR_OLD <= 0;
     end
     else begin 
-        V_AGEX_BR_STALL <= V_AGEX_BR_STALL;  //Placeholder for agex_br_stall logic.
         EXE_IR_OLD <= EXE_IR;
     end
 end
@@ -89,8 +90,7 @@ always @(posedge clk) begin
         MEM_V <= 0;
         MEM_ALU_RESULT <= 0;
     end
-    else begin
-    if (!V_MEM_STALL) begin
+    else if(EXE_V && !V_MEM_STALL &&) begin
         MEM_NPC <= EXE_NPC;
         MEM_ECALL <= EXE_ECALL;
         MEM_IR <= EXE_IR;
@@ -266,8 +266,19 @@ always @(posedge clk) begin
             end
         endcase
     end
-    end
 end
+else begin
+    MEM_NPC <= 0;
+    MEM_ECALL <= 0;
+    MEM_IR <= 0;
+    MEM_SR1 <= 0;
+    MEM_SR2 <= 0;
+    MEM_CSRFD <= 0;
+    MEM_RFD <= 0;
+    MEM_V <= 0;
+    MEM_ALU_RESULT <= 0;
+end
+
 end
 
 assign csrresult = (EXE_IR[13:12] == 2'b01) ? EXE_RFD : (EXE_IR[13:12] == 2'b10) ? (EXE_ALU1 | EXE_RFD) : (EXE_IR[13:12] == 2'b10) ? (EXE_ALU1 & EXE_RFD) : 'd0;
