@@ -20,7 +20,7 @@ reg [7:0] memory [`memSize:0];
 integer i;
 always @(posedge CLK) begin
     if (reset) begin
-        v_mem_stall <= 1'b0;
+        v_mem_stall <= 1'b0; //current memory implimentation has 1 cycle ld/st latency
         memory[0] <= 8'h01;
         memory[1] <= 8'h02;
         memory[2] <= 8'h03;

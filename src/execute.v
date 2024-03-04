@@ -21,8 +21,8 @@
 
 module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
                EXE_V, EXE_RFD, MEM_NPC, MEM_ALU_RESULT, MEM_IR,
-               MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, V_MEM_STALL, MEM_ECALL, EXE_ECALL, RESET
-                );
+               MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, V_MEM_STALL, MEM_ECALL, EXE_ECALL, RESET,
+               V_AGEX_BR_STALL, EXE_IR_OLD );
 
 //`define func3 EXE_IR[14:12];
 //`define EXE_IR[30] EXE_EXE_IR[30];
@@ -40,22 +40,25 @@ input [31:0] EXE_IR;
 input [63:0] EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2;
 input [63:0] EXE_RFD;
 output reg MEM_ECALL;
-output reg[31:0] MEM_IR;
+output reg[31:0] MEM_IR, EXE_IR_OLD;
 output reg [63:0] MEM_NPC, MEM_ALU_RESULT, MEM_SR2, MEM_SR1,
               MEM_CSRFD, MEM_RFD;
-output reg MEM_V;
+output reg MEM_V
+output V_AGEX_BR_STALL;
+output V_AGEX_TRAP_STALL;
+
 wire [63:0] csrresult;
-wire [31:0] IR;
-wire [63:0] alu_A, alu_B, EXE_PC, alu_out, temp, temp_div;
+
+wire [63:0] alu_A, alu_B, EXE_PC, temp_div;
 wire [63:0] tempsum, tempshiftright, tempshiftleft, tempsubab, tempblah;
 assign tempsum = alu_A + alu_B;
 assign tempshiftright = alu_A >> alu_B[4:0];
 assign tempshiftleft = alu_A << alu_B[4:0];
 assign tempsubab = alu_A - alu_B;
 assign tempblah = ((alu_A[31]) ? {32'hFFFFFFFF, alu_A[31:0]} : {32'd0, alu_A[31:0]}) >>> alu_B[4:0];
-reg [63:0] shift_out;
+// reg [63:0] shift_out;
 wire [127:0] temp_mul_uu, temp_mul_ss, temp_mul_su;
-assign EXE_pc = EXE_NPC - 'd4;
+assign EXE_PC = EXE_NPC - 'd4;
 assign temp_mul_uu = $unsigned(alu_A) * $unsigned(alu_B);
 assign temp_mul_ss = $signed(alu_A) * $signed(alu_B);
 assign temp_mul_su = $signed(alu_A) * $unsigned(alu_B);
@@ -64,6 +67,18 @@ assign alu_A = ((`opcode == 7'b0000011) || (`opcode == 0010111) ||
                 (`opcode == 7'b0100011) || (`opcode == 7'b1101111) ||
                 (`opcode == 7'b1100111))? EXE_PC : EXE_ALU1;
 assign alu_B = EXE_ALU2;
+assign V_AGEX_BR_STALL = (de_opcode == 7'b1100011 || de_opcode == 7'b1101111 || de_opcode == 7'b1100111) ? 1'd1 : 1'd0;
+assign V_AGEX_TRAP_STALL = (EXE_IR[27:0] == 28'h0000073) ? 1'd1 : 1'd0;
+
+
+always @(posedge clk) begin
+    if(RESET) begin 
+        EXE_IR_OLD <= 0;
+    end
+    else begin 
+        EXE_IR_OLD <= EXE_IR;
+    end
+end
 
 always @(posedge clk) begin
     if(RESET)begin
@@ -77,8 +92,7 @@ always @(posedge clk) begin
         MEM_V <= 0;
         MEM_ALU_RESULT <= 0;
     end
-    else begin
-    if (!V_MEM_STALL) begin
+    else if(EXE_V && !V_MEM_STALL &&) begin
         MEM_NPC <= EXE_NPC;
         MEM_ECALL <= EXE_ECALL;
         MEM_IR <= EXE_IR;
@@ -91,7 +105,6 @@ always @(posedge clk) begin
     //LUI
     if (`opcode == 7'b0110111) begin
         MEM_ALU_RESULT <= alu_B;
-        //alu_out <= alu_B;
     //AUIPC, JAL, JALR, LD, ST
     end else if ((`opcode == 7'b0010111) || (`opcode == 7'b1101111) || (`opcode == 7'b1100111) || (`opcode == 7'b0000011) || (`opcode == 7'b0100011)) begin
         MEM_ALU_RESULT <= alu_A + alu_B;
@@ -255,8 +268,19 @@ always @(posedge clk) begin
             end
         endcase
     end
-    end
 end
+else begin
+    MEM_NPC <= 0;
+    MEM_ECALL <= 0;
+    MEM_IR <= 0;
+    MEM_SR1 <= 0;
+    MEM_SR2 <= 0;
+    MEM_CSRFD <= 0;
+    MEM_RFD <= 0;
+    MEM_V <= 0;
+    MEM_ALU_RESULT <= 0;
+end
+
 end
 
 assign csrresult = (EXE_IR[13:12] == 2'b01) ? EXE_RFD : (EXE_IR[13:12] == 2'b10) ? (EXE_ALU1 | EXE_RFD) : (EXE_IR[13:12] == 2'b10) ? (EXE_ALU1 & EXE_RFD) : 'd0;

@@ -9,9 +9,9 @@
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: This File holds the Control Status Registers for the core and handles
-// the hardware operations that occur when a context switch occurs (interrupt/exception).
-// The CSR file can also be written to and read from using the 6 csr instructions
+// Description: This File is the trap handler which sets the cause register based
+// on the incoming exception/interrupt and sets the context switch signal high. 
+// These signals are sent to the CSR file in the decode stage.
 //  
 // 
 // Dependencies: 
