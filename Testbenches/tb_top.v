@@ -19,5 +19,4 @@ end
 
 always #5 CLK = ~CLK; 
 
-
 endmodule
