@@ -129,7 +129,7 @@ always @(*) begin
     end
 end
 
-assign v_de_br_stall = (de_opcode == 7'b1100011 || de_opcode == 7'b1101111 || de_opcode == 7'b1100111) ? 1'd1 : 1'd0;
+assign v_de_br_stall = (`de_opcode == 7'b1100011 || `de_opcode == 7'b1101111 || `de_opcode == 7'b1100111) ? 1'd1 : 1'd0;
 assign EXE_ECALL_in = (DE_IR[27:0] == 28'h0000073) ? 1'd1 : 1'd0;
 assign V_DE_TRAP_STALL = (DE_IR[27:0] == 28'h0000073) ? 1'd1 : 1'd0;
 assign LD_AGEX = DE_V && !V_MEM_STALL;

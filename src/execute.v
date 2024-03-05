@@ -22,15 +22,16 @@
 module execute(EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2, EXE_IR,
                EXE_V, EXE_RFD, MEM_NPC, MEM_ALU_RESULT, MEM_IR,
                MEM_SR2, MEM_SR1, MEM_V, MEM_CSRFD, MEM_RFD,clk, V_MEM_STALL, MEM_ECALL, EXE_ECALL, RESET,
-               V_AGEX_BR_STALL, EXE_IR_OLD );
+               V_AGEX_BR_STALL, EXE_IR_OLD, V_AGEX_TRAP_STALL);
 
 //`define func3 EXE_IR[14:12];
 //`define EXE_IR[30] EXE_EXE_IR[30];
 //`define EXE_IR[6:0] EXE_IR[6:0]
 //`define EXE_IR[13:12] EXE_IR[13:12];
-`define opcode EXE_IR[6:0]
+`define exe_opcode EXE_IR[6:0]
 `define func3 EXE_IR[14:12]
 `define func7 EXE_IR[31:25]
+
 input clk;
 input EXE_V;
 input V_MEM_STALL;
@@ -43,7 +44,7 @@ output reg MEM_ECALL;
 output reg[31:0] MEM_IR, EXE_IR_OLD;
 output reg [63:0] MEM_NPC, MEM_ALU_RESULT, MEM_SR2, MEM_SR1,
               MEM_CSRFD, MEM_RFD;
-output reg MEM_V
+output reg MEM_V;
 output V_AGEX_BR_STALL;
 output V_AGEX_TRAP_STALL;
 
@@ -63,11 +64,11 @@ assign temp_mul_uu = $unsigned(alu_A) * $unsigned(alu_B);
 assign temp_mul_ss = $signed(alu_A) * $signed(alu_B);
 assign temp_mul_su = $signed(alu_A) * $unsigned(alu_B);
 
-assign alu_A = ((`opcode == 7'b0000011) || (`opcode == 0010111) ||
-                (`opcode == 7'b0100011) || (`opcode == 7'b1101111) ||
-                (`opcode == 7'b1100111))? EXE_PC : EXE_ALU1;
+assign alu_A = ((`exe_opcode == 7'b0000011) || (`exe_opcode == 0010111) ||
+                (`exe_opcode == 7'b0100011) || (`exe_opcode == 7'b1101111) ||
+                (`exe_opcode == 7'b1100111))? EXE_PC : EXE_ALU1;
 assign alu_B = EXE_ALU2;
-assign V_AGEX_BR_STALL = (de_opcode == 7'b1100011 || de_opcode == 7'b1101111 || de_opcode == 7'b1100111) ? 1'd1 : 1'd0;
+assign V_AGEX_BR_STALL = (`exe_opcode == 7'b1100011 || `exe_opcode == 7'b1101111 || `exe_opcode == 7'b1100111) ? 1'd1 : 1'd0;
 assign V_AGEX_TRAP_STALL = (EXE_IR[27:0] == 28'h0000073) ? 1'd1 : 1'd0;
 
 
@@ -92,7 +93,7 @@ always @(posedge clk) begin
         MEM_V <= 0;
         MEM_ALU_RESULT <= 0;
     end
-    else if(EXE_V && !V_MEM_STALL &&) begin
+    else if(EXE_V && !V_MEM_STALL) begin
         MEM_NPC <= EXE_NPC;
         MEM_ECALL <= EXE_ECALL;
         MEM_IR <= EXE_IR;
@@ -103,12 +104,12 @@ always @(posedge clk) begin
         MEM_V <= EXE_V;
    
     //LUI
-    if (`opcode == 7'b0110111) begin
+    if (`exe_opcode == 7'b0110111) begin
         MEM_ALU_RESULT <= alu_B;
     //AUIPC, JAL, JALR, LD, ST
-    end else if ((`opcode == 7'b0010111) || (`opcode == 7'b1101111) || (`opcode == 7'b1100111) || (`opcode == 7'b0000011) || (`opcode == 7'b0100011)) begin
+    end else if ((`exe_opcode == 7'b0010111) || (`exe_opcode == 7'b1101111) || (`exe_opcode == 7'b1100111) || (`exe_opcode == 7'b0000011) || (`exe_opcode == 7'b0100011)) begin
         MEM_ALU_RESULT <= alu_A + alu_B;
-    end else if (`opcode == 7'b0010011) begin
+    end else if (`exe_opcode == 7'b0010011) begin
         case (`func3)
             3'd0:begin
                 MEM_ALU_RESULT <= alu_A + alu_B;
@@ -139,7 +140,7 @@ always @(posedge clk) begin
                 MEM_ALU_RESULT <= alu_A & alu_B;
             end
         endcase
-    end else if (`opcode == 7'b0110011) begin
+    end else if (`exe_opcode == 7'b0110011) begin
         case (`func3)
             3'd0:begin
                 if (EXE_IR[30] == 1'b1) begin
@@ -174,7 +175,7 @@ always @(posedge clk) begin
                 MEM_ALU_RESULT <= alu_A & alu_B;
             end
         endcase
-    end else if (`opcode == 7'b0011011) begin
+    end else if (`exe_opcode == 7'b0011011) begin
         case (`func3)
             3'd0: begin
                 MEM_ALU_RESULT <= (tempsum[31]) ? {32'hFFFFFFFF, tempsum[31:0]} : {32'd0, tempsum[31:0]};
@@ -190,7 +191,7 @@ always @(posedge clk) begin
                 end
             end
         endcase
-    end else if (`opcode == 7'b0111011) begin
+    end else if (`exe_opcode == 7'b0111011) begin
         case (`func3)
             3'd0: begin
                 if (EXE_IR[30] == 1'b1) begin
@@ -210,7 +211,7 @@ always @(posedge clk) begin
                 end
             end
         endcase
-    end else if (`opcode == 7'b0110011) begin
+    end else if (`exe_opcode == 7'b0110011) begin
         case (`func3)
             3'd0: begin
                 MEM_ALU_RESULT <= temp_mul_uu[63:0];
@@ -237,7 +238,7 @@ always @(posedge clk) begin
                 MEM_ALU_RESULT <= $unsigned(alu_A) % $unsigned(alu_B);
             end
         endcase
-    end else if (`opcode == 7'b0111011) begin
+    end else if (`exe_opcode == 7'b0111011) begin
         case(`func3)
             3'd0: begin
                 if (temp_div[63]) begin

@@ -59,6 +59,7 @@ module memory(
 
 wire [63:0] data_out, data;
 wire [1:0] size;
+`define mem_opcode MEM_IR[6:0]
 
 assign we = (MEM_IR[6:0] == 7'b0100011);
 assign lam_in = (!we && (MEM_ALU_RESULT & 64'd7)) == 0 ? 1'b0 : 1'b1;
@@ -68,12 +69,11 @@ memoryFile m0 (.MEM_V(MEM_V), .CLK(CLK), .reset(RESET), .we(we), .size(size), .m
 
 
 assign data_out = (MEM_IR[14:12] == 3'b000) ? (data&(64'h0FF)) : (MEM_IR[14:12] == 3'b001) ? (data&(64'h0FFFF)) : (MEM_IR[14:12] == 3'b010) ? (data&(64'h0FFFFFFFF)) : (MEM_IR[14:12] == 3'b011) ? data : (MEM_IR[14:12] == 3'b100) ? ((data&(64'h0FF))<<8) : (MEM_IR[14:12] == 3'b101) ? ((data&(64'h0FFFF))<<16) : ((data&(64'h0FFFFFFFF))<<32);
-assign V_MEM_BR_STALL = (de_opcode == 7'b1100011 || de_opcode == 7'b1101111 || de_opcode == 7'b1100111) ? 1'd1 : 1'd0;
+assign V_MEM_BR_STALL = (`mem_opcode == 7'b1100011 || `mem_opcode == 7'b1101111 || `mem_opcode == 7'b1100111) ? 1'd1 : 1'd0;
 assign V_MEM_TRAP_STALL = (MEM_IR[27:0] == 28'h0000073) ? 1'd1 : 1'd0;
 
 always @(posedge CLK) begin
     if(RESET) begin 
-        V_MEM_BR_STALL <= 1'b0;
         WB_V <= 1'b0;
         MEM_LAF <= 1'b0;
         MEM_SAF <= 1'b0;

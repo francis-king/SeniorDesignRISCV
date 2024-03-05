@@ -214,7 +214,7 @@ memory memory_stage(
     .MEM_LAF(mem_laf),
     .MEM_SAM(mem_sam),
     .MEM_SAF(mem_saf),
-    .V_MEM_BR_STALL(v_mem_br_stall)
+    .V_MEM_BR_STALL(v_mem_br_stall),
     .V_MEM_TRAP_STALL(v_mem_trap_stall)
 );
 

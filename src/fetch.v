@@ -74,7 +74,7 @@ assign FE_IAM = (FE_PC & 64'd3) == 0 ? 1'b0 : 1'b1;
 // } else if (v_mem_br_stall && mem_pcmux == 0) {
 //     FE_LD_PC = 0;
 // } else { FE_LD_PC = 1; }
-assign FE_LD_PC = (v_mem_stall || v_de_br_stall || v_agex_br_stall || (icache_r && !v_mem_br_stall) || (v_mem_br_stall && !WB_PC_MUX) || V_DE_TRAP_STALL || V_AGEX_TRAP_STALL || V_MEM_TRAP_STALL) ? 'd0 : 'd1;
+assign FE_LD_PC = (v_mem_stall || v_de_br_stall || v_agex_br_stall || (!icache_r && !v_mem_br_stall) || (v_mem_br_stall && !WB_PC_MUX) || V_DE_TRAP_STALL || V_AGEX_TRAP_STALL || V_MEM_TRAP_STALL) ? 'd0 : 'd1;
 // if(dep_stall || mem_stall) {
 //     LD_DE = 0;
 // } else { LD_DE = 1; }
