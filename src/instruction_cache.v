@@ -17,7 +17,7 @@ integer i;
 
 always @(posedge CLK) begin
     if (reset) begin
-        //ADD R1, R1, #5
+        //ADDI R1, R1, #5
         memory[0] <= 8'h93;
         memory[1] <= 8'h80;
         memory[2] <= 8'h50;
