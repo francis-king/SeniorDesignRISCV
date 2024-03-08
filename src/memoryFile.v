@@ -21,14 +21,14 @@ integer i;
 always @(posedge CLK) begin
     if (reset) begin
         v_mem_stall <= 1'b0; //current memory implimentation has 1 cycle ld/st latency
-        memory[0] <= 8'h01;
-        memory[1] <= 8'h02;
-        memory[2] <= 8'h03;
-        memory[3] <= 8'h04;
-        memory[4] <= 8'h01;
-        memory[5] <= 8'h02;
-        memory[6] <= 8'h03;
-        memory[7] <= 8'h04;
+        memory[0] <= 8'h00;
+        memory[1] <= 8'h00;
+        memory[2] <= 8'h00;
+        memory[3] <= 8'h00;
+        memory[4] <= 8'h00;
+        memory[5] <= 8'h00;
+        memory[6] <= 8'h00;
+        memory[7] <= 8'h00;
 
         for(i = `numInstructions; i < `memSize + 1; i = i + 1) begin
             memory[i] = 'd0;

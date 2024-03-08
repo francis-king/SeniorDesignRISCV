@@ -167,6 +167,8 @@ always @(posedge CLK) begin
         EXE_V <= 'd0;
         EXE_ECALL <= 'd0;
         EXE_RFD <= 'd0;
+        EXE_ALU_ONE <= 'd0;
+        EXE_ALU_TWO <= 'd0;
     end else if (LD_AGEX) begin
         EXE_RFD <= exe_rfd_latch;
         EXE_NPC <= DE_NPC; 
