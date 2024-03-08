@@ -58,7 +58,7 @@ end
 //end
 // assign icache_r = (PC[63:12] == cacheAddress) ? 'd1 : 'd0;
 assign icache_r = 1'b1;
-assign instruction = {memory[{PC[3:2],2'b11}], memory[{PC[3:2],2'b10}], memory[{PC[3:2],2'b01}], memory[{PC[3:2],2'b00}]};
+assign instruction = {memory[{PC[63:2],2'b11}], memory[{PC[63:2],2'b10}], memory[{PC[63:2],2'b01}], memory[{PC[63:2],2'b00}]};
 
 //add in code to talk to memory bus
 
