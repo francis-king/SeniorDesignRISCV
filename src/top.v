@@ -35,6 +35,7 @@ wire v_mem_br_stall;
 wire v_de_trap_stall;
 wire v_agex_trap_stall;
 wire v_mem_trap_stall;
+wire v_hazard_stall;
 
 
 //wires from FETCH stage
@@ -59,7 +60,7 @@ wire [63:0] exe_alu_one;
 wire [63:0] exe_alu_two; 
 wire [63:0] exe_rfd; 
 wire [31:0] exe_ir; 
-wire        exe_valid; 
+wire        exe_v; 
 wire        exe_ecall; 
 
 //wires from MEMORY stage
@@ -116,6 +117,7 @@ fetch fetch_stage(
     .V_DE_TRAP_STALL(v_de_trap_stall),
     .V_AGEX_TRAP_STALL(v_agex_trap_stall),
     .V_MEM_TRAP_STALL(v_mem_trap_stall),
+    .V_HAZARD_STALL(v_hazard_stall),
     .CLK(CLK),
     .RESET(RESET),
     .DE_NPC(de_npc),
@@ -155,6 +157,7 @@ decode decode_stage(
     .EXE_RFD(exe_rfd),
     .v_de_br_stall(v_de_br_stall),
     .V_DE_TRAP_STALL(v_de_trap_stall),
+    .V_HAZARD_STALL(v_hazard_stall),
     .DE_MTVEC(de_mtvec),
     .PRIVILEGE(privilege),
     .DE_CS(de_cs)

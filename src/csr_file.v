@@ -51,20 +51,20 @@ assign RET = {2'b0,RETURN_PRIVILEGE,28'h0200073};
 
 always @(posedge CLK) begin
     if(CS)begin
-        regFile[{2'b0,2'b11,8'h42}] <= CAUSE;                                        //_Cause register set
-        PC_OUT <= regFile[{2'b0,2'b11,8'h05}] + (4*(CAUSE[12:0]));                   //trap address in vector table
-        regFile[{2'b0,2'b11,8'h00}][12:11] <= 2'b11;                                         //setting _status.xpp
+        regFile[{2'b0,2'b11,8'h42}] <= CAUSE;                                                  //_Cause register set
+        PC_OUT <= regFile[{2'b0,2'b11,8'h05}] + (4*(CAUSE[12:0]));                             //trap address in vector table
+        regFile[{2'b0,2'b11,8'h00}][12:11] <= 2'b11;                                           //setting _status.xpp
         regFile[{2'b0,2'b11,8'h00}][2'b11+4] <= regFile[{2'b0,2'b11,8'h00}][RETURN_PRIVILEGE]; //setting _status.xpie to _status.yie
-        regFile[{2'b0,2'b11,8'h00}][2'b11] <= 0;                                             //setting _status.xie to 0
-        regFile[{2'b0,2'b11,8'h41}] <= NPC;                                                  //saving PC in _PC
-        PRIVILEGE <= 2'b11;
+        regFile[{2'b0,2'b11,8'h00}][2'b11] <= 0;                                               //setting _status.xie to 0
+        regFile[{2'b0,2'b11,8'h41}] <= NPC;                                                    //saving PC in _PC
+        PRIVILEGE <= 2'b11;                                                                    //switching to machine mode
         DE_CS <= 1;                                                                                                 
     end
     else if(IR == RET)begin
         regFile[{2'b0,PRIVILEGE,8'h00}][RETURN_PRIVILEGE] <= regFile[{2'b0,PRIVILEGE,8'h00}][PRIVILEGE+4];  //setting _status.yie to _status.xpie
-        regFile[{2'b0,PRIVILEGE,8'h00}][PRIVILEGE+4] <= 1;                                                            //setting _status.xie to 1
-        PC_OUT <= regFile[{2'b0,PRIVILEGE,8'h41}];                                                                         //outputting _epc
-        PRIVILEGE <= RETURN_PRIVILEGE;
+        regFile[{2'b0,PRIVILEGE,8'h00}][PRIVILEGE+4] <= 1;                                                  //setting _status.xie to 1
+        PC_OUT <= regFile[{2'b0,PRIVILEGE,8'h41}];                                                          //outputting _epc
+        PRIVILEGE <= RETURN_PRIVILEGE;                                                                      //reseting the privilige
         DE_CS <= 1;                                                                                                 
 
     end

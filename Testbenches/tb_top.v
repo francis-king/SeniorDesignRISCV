@@ -20,3 +20,8 @@ end
 always #5 CLK = ~CLK; 
 
 endmodule
+
+//instructions tested:
+
+//ADDI r1, r1, 5 => 0x00030839
+//SLTI r2, r1, 9 => 0x0090A113

@@ -5,13 +5,11 @@
 // 
 // Create Date: 02/02/2024 12:55:36 PM
 // Design Name: 
-// Module Name: csr
+// Module Name: memory
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: This File holds the Control Status Registers for the core and handles
-// the hardware operations that occur when a context switch occurs (interrupt/exception).
-// The CSR file can also be written to and read from using the 6 csr instructions
+// Description: 
 //  
 // 
 // Dependencies: 
@@ -47,7 +45,7 @@ module memory(
     output reg        WB_V,
     output reg [63:0] WB_RFD,
     output reg        WB_ECALL,
-    output reg [31:0] MEM_IR_OLD,
+    output     [31:0] MEM_IR_OLD,
     output reg        MEM_LAM,
     output reg        MEM_LAF,
     output reg        MEM_SAM,
@@ -67,7 +65,7 @@ assign sam_in = (we && (MEM_ALU_RESULT & 64'd7)) == 0 ? 1'b0 : 1'b1;
 assign size = (MEM_IR[14:12] == 3'b000) ? 2'b00 : (MEM_IR[14:12] == 3'b001) ? 2'b01 : (MEM_IR[14:12] == 3'b010) ? 2'b10 : 2'b11;
 memoryFile m0 (.MEM_V(MEM_V), .CLK(CLK), .reset(RESET), .we(we), .size(size), .mem_data(MEM_SR2), .address(MEM_ALU_RESULT), .v_mem_stall(V_MEM_STALL), .data_out(data));
 
-
+assign MEM_IR_OLD = MEM_IR;
 assign data_out = (MEM_IR[14:12] == 3'b000) ? (data&(64'h0FF)) : (MEM_IR[14:12] == 3'b001) ? (data&(64'h0FFFF)) : (MEM_IR[14:12] == 3'b010) ? (data&(64'h0FFFFFFFF)) : (MEM_IR[14:12] == 3'b011) ? data : (MEM_IR[14:12] == 3'b100) ? ((data&(64'h0FF))<<8) : (MEM_IR[14:12] == 3'b101) ? ((data&(64'h0FFFF))<<16) : ((data&(64'h0FFFFFFFF))<<32);
 assign V_MEM_BR_STALL = (`mem_opcode == 7'b1100011 || `mem_opcode == 7'b1101111 || `mem_opcode == 7'b1100111) ? 1'd1 : 1'd0;
 assign V_MEM_TRAP_STALL = (MEM_IR[27:0] == 28'h0000073) ? 1'd1 : 1'd0;
@@ -78,7 +76,6 @@ always @(posedge CLK) begin
         MEM_LAF <= 1'b0;
         MEM_SAF <= 1'b0;
         WB_PC_MUX <= 1'b0;
-        MEM_IR_OLD <= 0;
         WB_ALU_RESULT <= 0;
         WB_MEM_RESULT <= 0;
         WB_NPC <= 0;
@@ -94,7 +91,6 @@ always @(posedge CLK) begin
             MEM_LAM <= lam_in;
             MEM_SAM <= sam_in;
             WB_NPC <= MEM_NPC;
-            MEM_IR_OLD <= MEM_IR;
             WB_ALU_RESULT <= MEM_ALU_RESULT;
             WB_MEM_RESULT <= data_out;
             WB_IR <= MEM_IR;

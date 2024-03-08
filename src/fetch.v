@@ -12,6 +12,7 @@ module fetch (
     input V_DE_TRAP_STALL,
     input V_AGEX_TRAP_STALL,
     input V_MEM_TRAP_STALL,
+    input V_HAZARD_STALL,
     input CLK,
     input RESET,
     output reg [63:0] DE_NPC,
@@ -39,23 +40,21 @@ always @(posedge CLK) begin
         
     end
 
-    if(RESET) begin
-        DE_NPC <= 'd0;
-        DE_IR <= 'd0;
-    end
-    else begin
-        DE_NPC <= FE_PC + 4;
-        DE_IR <= FE_instruction;
-    end
     
     if (RESET) begin
         DE_V <= 0;
+        DE_NPC <= 'd0;
+        DE_IR <= 'd0;
     end
-    else if (FE_LD_DE) begin
+    else if (FE_LD_DE && !V_HAZARD_STALL) begin
         DE_V <= icache_r && !v_de_br_stall && !v_agex_br_stall && !v_mem_br_stall && !V_DE_TRAP_STALL && !V_AGEX_TRAP_STALL && !V_MEM_TRAP_STALL;
+        DE_NPC <= FE_PC + 4;
+        DE_IR <= FE_instruction;
     end
     else begin
-        DE_V <= 0;
+        DE_V <= DE_V;
+        DE_NPC <= DE_NPC;
+        DE_IR <= DE_IR;
     end
 end
 
@@ -74,7 +73,7 @@ assign FE_IAM = (FE_PC & 64'd3) == 0 ? 1'b0 : 1'b1;
 // } else if (v_mem_br_stall && mem_pcmux == 0) {
 //     FE_LD_PC = 0;
 // } else { FE_LD_PC = 1; }
-assign FE_LD_PC = (v_mem_stall || v_de_br_stall || v_agex_br_stall || (!icache_r && !v_mem_br_stall) || (v_mem_br_stall && !WB_PC_MUX) || V_DE_TRAP_STALL || V_AGEX_TRAP_STALL || V_MEM_TRAP_STALL) ? 'd0 : 'd1;
+assign FE_LD_PC = (v_mem_stall || v_de_br_stall || v_agex_br_stall || (!icache_r && !v_mem_br_stall) || (v_mem_br_stall && !WB_PC_MUX) || V_DE_TRAP_STALL || V_AGEX_TRAP_STALL || V_MEM_TRAP_STALL || V_HAZARD_STALL) ? 'd0 : 'd1;
 // if(dep_stall || mem_stall) {
 //     LD_DE = 0;
 // } else { LD_DE = 1; }

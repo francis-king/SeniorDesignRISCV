@@ -41,7 +41,8 @@ input [31:0] EXE_IR;
 input [63:0] EXE_NPC, EXE_CSRFD, EXE_ALU1, EXE_ALU2;
 input [63:0] EXE_RFD;
 output reg MEM_ECALL;
-output reg[31:0] MEM_IR, EXE_IR_OLD;
+output reg[31:0] MEM_IR;
+output [31:0] EXE_IR_OLD;
 output reg [63:0] MEM_NPC, MEM_ALU_RESULT, MEM_SR2, MEM_SR1,
               MEM_CSRFD, MEM_RFD;
 output reg MEM_V;
@@ -70,16 +71,8 @@ assign alu_A = ((`exe_opcode == 7'b0000011) || (`exe_opcode == 0010111) ||
 assign alu_B = EXE_ALU2;
 assign V_AGEX_BR_STALL = (`exe_opcode == 7'b1100011 || `exe_opcode == 7'b1101111 || `exe_opcode == 7'b1100111) ? 1'd1 : 1'd0;
 assign V_AGEX_TRAP_STALL = (EXE_IR[27:0] == 28'h0000073) ? 1'd1 : 1'd0;
+assign EXE_IR_OLD = EXE_IR;
 
-
-always @(posedge clk) begin
-    if(RESET) begin 
-        EXE_IR_OLD <= 0;
-    end
-    else begin 
-        EXE_IR_OLD <= EXE_IR;
-    end
-end
 
 always @(posedge clk) begin
     if(RESET)begin

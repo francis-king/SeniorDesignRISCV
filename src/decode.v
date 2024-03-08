@@ -1,4 +1,24 @@
 `timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 02/23/2024 12:49:36 PM
+// Design Name: 
+// Module Name: decode
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: decodes the instruction from the fetch stage. The CSR and GPR files
+// are stored in this stage. 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
 
 module decode (   
     input        CLK,
@@ -30,15 +50,17 @@ module decode (
     output reg [63:0] EXE_RFD,
     output            v_de_br_stall,
     output            V_DE_TRAP_STALL,
+    output            V_HAZARD_STALL,
     output     [63:0] DE_MTVEC,
     output DE_CS,
     output [1:0] PRIVILEGE
 );
 `define de_func3 DE_IR[14:12]
 `define de_opcode DE_IR[6:0]
-wire DE_MEM_ALU_SR, DE_WB_ALU_SR, DE_WB_MEM_SR, LD_AGEX;
+wire DE_MEM_ALU_SR, DE_WB_ALU_SR, DE_WB_MEM_SR, LD_AGEX, dependency_stall;
 reg [63:0]  de_ALU1_out, de_ALU2_reg_out, exe_alu_in, de_ALU2_imm_out;
 wire [63:0] de_reg_out_one, de_reg_out_two, exe_rfd_latch;
+
 register_file regFile (
     .DR(WB_IR[11:7]), 
     .SR1(DE_IR[19:15]), 
@@ -50,7 +72,7 @@ register_file regFile (
     .out_two(de_reg_out_two), 
     .CLK(CLK)
     );
-assign v_ir = DE_V & DE_IR;
+
 csr_file csr(
     .RESET(RESET),
     .DR(WB_IR[31:20]),
@@ -96,6 +118,7 @@ always @(*) begin
     end
 end
 
+//handling data forwarding
 assign DE_MEM_ALU_SR = ((EXE_IR_OLD[11:7] == DE_IR[19:15]) && !EXE_IR_OLD[6] && EXE_IR_OLD[4]) ? 'd1 : 'd0;
 assign DE_WB_MEM_SR = ((MEM_IR_OLD[11:7] == DE_IR[19:15]) && !MEM_IR_OLD[6] && !MEM_IR_OLD[4]) ? 'd1 : 'd0;
 assign DE_WB_ALU_SR = ((MEM_IR_OLD[11:7] == DE_IR[19:15]) && !MEM_IR_OLD[6] && MEM_IR_OLD[4]) ? 'd1 : 'd0;
@@ -132,8 +155,10 @@ end
 assign v_de_br_stall = (`de_opcode == 7'b1100011 || `de_opcode == 7'b1101111 || `de_opcode == 7'b1100111) ? 1'd1 : 1'd0;
 assign EXE_ECALL_in = (DE_IR[27:0] == 28'h0000073) ? 1'd1 : 1'd0;
 assign V_DE_TRAP_STALL = (DE_IR[27:0] == 28'h0000073) ? 1'd1 : 1'd0;
-assign LD_AGEX = DE_V && !V_MEM_STALL;
+assign dependency_stall = DE_MEM_ALU_SR && (EXE_IR_OLD != MEM_IR_OLD);
+assign LD_AGEX = DE_V && !V_MEM_STALL && !dependency_stall;
 assign EXE_V_in = DE_V && !V_MEM_STALL;
+assign V_HAZARD_STALL = dependency_stall;
 always @(posedge CLK) begin
     if (RESET) begin
         EXE_NPC <= 'd0;
@@ -151,6 +176,9 @@ always @(posedge CLK) begin
         EXE_IR <= DE_IR;
         EXE_V <= EXE_V_in;
         EXE_ECALL <= EXE_ECALL_in;
+    end
+    else begin
+        EXE_V <= 0;
     end
 end
 endmodule

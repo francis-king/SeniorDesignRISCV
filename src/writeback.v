@@ -5,11 +5,11 @@
 // 
 // Create Date: 02/02/2024 12:55:36 PM
 // Design Name: 
-// Module Name: csr
+// Module Name: writeback
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
-// Description: This File handles the writeback of data to the register and csr file.
+// Description: This File handles the writeback of data to the gpr and csr file.
 //  
 // 
 // Dependencies: 
